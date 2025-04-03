@@ -1,4 +1,4 @@
-import { MongoClient, ServerApiVersion } from 'mongodb'
+import mongoose from 'mongoose'
 
 const mongoDBUser = process.env.MONGODB_USER
 const mongoDBPassword = process.env.MONGODB_PASSWORD
@@ -11,23 +11,21 @@ if (!mongoDBUser || !mongoDBPassword || !mongoDBURI || !mongoDBCluster) {
 
 const uri = `mongodb+srv://${mongoDBUser}:${mongoDBPassword}@${mongoDBURI}/?retryWrites=true&w=majority&appName=${mongoDBCluster}`
 
-// Create a MongoClient with a MongoClientOptions object to set the Stable API version
-const client = new MongoClient(uri, {
-  serverApi: {
-    version: ServerApiVersion.v1,
-    strict: true,
-    deprecationErrors: true,
-  },
-})
+mongoose.connection.on('connected', () => console.log('[server] Mongoose connected'))
+mongoose.connection.on('open', () => console.log('[server] Mongoose open'))
+mongoose.connection.on('disconnected', () => console.log('[server] Mongoose disconnected'))
+mongoose.connection.on('reconnected', () => console.log('[server] Mongoose reconnected'))
+mongoose.connection.on('disconnecting', () => console.log('[server] Mongoose disconnecting'))
+mongoose.connection.on('close', () => console.log('[server] Mongoose close'))
 
 async function connectToDatabase() {
   try {
-    await client.connect()
-    await client.db('admin').command({ ping: 1 })
-    console.log('[server] Successfully connected to MongoDB')
-  } finally {
-    await client.close()
+    await mongoose.connect(uri)
+    console.log('[server] Successfully connected to MongoDB via Mongoose')
+  } catch (error) {
+    console.error('[server] Error connecting to MongoDB:', error)
+    throw error
   }
 }
 
-export { client, connectToDatabase }
+export { connectToDatabase }
