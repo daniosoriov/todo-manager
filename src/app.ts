@@ -3,7 +3,7 @@ import helmet from 'helmet'
 import dotenv from 'dotenv'
 
 dotenv.config()
-import apiRouter from './api'
+import apiRouterV1 from './api/v1.0'
 import { connectToDatabase } from './db'
 import logRequest from '@src/middleware/logRequest'
 
@@ -15,7 +15,7 @@ app.disable('x-powered-by')
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
 
-app.use('/v1.0', logRequest, apiRouter)
+app.use('/v1.0', logRequest, apiRouterV1)
 
 connectToDatabase().then(() => {
   const server = app.listen(port, '0.0.0.0', (error) => {
