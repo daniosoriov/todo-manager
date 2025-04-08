@@ -1,4 +1,5 @@
 import express from 'express'
+import getAllTasks from '@src/api/v1.0/task/getAllTasks'
 import getTask from '@src/api/v1.0/task/getTask'
 import createTask from '@src/api/v1.0/task/createTask'
 import updateTask from '@src/api/v1.0/task/updateTask'
@@ -11,6 +12,7 @@ import fieldValidation from '@src/middleware/fieldValidation'
 
 const taskRouter = express.Router({ mergeParams: true })
 
+taskRouter.get('/', getAllTasks)
 taskRouter.get('/:taskId', getTaskValidators, fieldValidation, getTask)
 taskRouter.post('/', createTaskValidators, fieldValidation, createTask)
 taskRouter.put('/:taskId', updateTaskValidators, fieldValidation, updateTask)
