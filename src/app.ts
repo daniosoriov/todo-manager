@@ -3,8 +3,8 @@ import helmet from 'helmet'
 import dotenv from 'dotenv'
 
 dotenv.config()
-import apiRouterV1 from './api/v1.0'
-import { connectToDatabase } from './db'
+import apiRouterV1 from '@src/api/v1.0'
+import { connectToDatabase } from '@src/db'
 import logRequest from '@src/middleware/logRequest'
 
 const app = express()
