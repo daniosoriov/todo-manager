@@ -2,14 +2,32 @@
   "name": "todo-manager",
   "version": "1.0.0",
   "main": "index.js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/daniosoriov/todo-manager.git"
+  },
+  "bugs": {
+    "email": "danioshi@gmail.com",
+    "url": "https://github.com/daniosoriov/todo-manager/issues"
+  },
   "scripts": {
     "start": "nodemon --watch 'src/**/*.ts' --exec 'ts-node -r tsconfig-paths/register' src/app.ts",
     "test": "vitest --config ./vitest.config.ts"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "description": "",
+  "keywords": [
+    "todo",
+    "typescript",
+    "express",
+    "mongodb",
+    "task manager",
+    "api"
+  ],
+  "author": "Daniel Osorio",
+  "license": "MIT",
+  "description": "A simple TODO manager API built with TypeScript, Express, and MongoDB.",
+  "engines": {
+    "node": ">=22.0.0"
+  },
   "dependencies": {
     "dotenv": "^16.4.7",
     "express": "^5.1.0",
