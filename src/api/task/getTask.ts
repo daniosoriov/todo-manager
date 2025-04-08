@@ -3,7 +3,7 @@ import Task from '@src/models/Task'
 
 const getTask = async (req: Request, res: Response) => {
   try {
-    const taskId = req.params.id
+    const taskId = req.params.taskId
     const task = await Task.findById(taskId)
     if (!task) {
       res.status(404).json({ error: 'Task not found' })

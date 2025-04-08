@@ -1,4 +1,5 @@
 import { Schema, model } from 'mongoose'
+import { taskStatus } from '@src/types/types'
 
 const taskSchema = new Schema({
   title: {
@@ -11,7 +12,7 @@ const taskSchema = new Schema({
   },
   status: {
     type: String,
-    enum: ['pending', 'in-progress', 'completed'],
+    enum: taskStatus,
     default: 'pending',
   },
   creationDate: {
