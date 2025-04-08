@@ -13,8 +13,9 @@
   "dependencies": {
     "dotenv": "^16.4.7",
     "express": "^5.1.0",
+    "express-validator": "^7.2.1",
     "mongodb": "^6.15.0",
-    "mongoose": "^8.13.1"
+    "mongoose": "^8.13.2"
   },
   "devDependencies": {
     "@tsconfig/node22": "^22.0.1",
@@ -22,6 +23,6 @@
     "@types/node": "^22.14.0",
     "ts-node": "^10.9.2",
     "tsconfig-paths": "^4.2.0",
-    "typescript": "^5.8.2"
+    "typescript": "^5.8.3"
   }
 }
