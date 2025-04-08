@@ -42,7 +42,6 @@ const bodyDateOptional = (field: string) =>
         .optional()
         .isISO8601()
         .withMessage(`'${field}' must be a valid ISO8601 date.`)
-        .toDate()
 
 const bodyDateRequired = (field: string) =>
     body(field)
@@ -50,7 +49,6 @@ const bodyDateRequired = (field: string) =>
         .withMessage(`'${field}' is required.`)
         .isISO8601()
         .withMessage(`'${field}' must be a valid ISO8601 date.`)
-        .toDate()
 
 const paramTaskId = () =>
     param('taskId')
