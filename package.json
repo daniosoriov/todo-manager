@@ -4,7 +4,7 @@
   "main": "index.js",
   "scripts": {
     "start": "nodemon --watch 'src/**/*.ts' --exec 'ts-node -r tsconfig-paths/register' src/app.ts",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "vitest --config ./vitest.config.ts"
   },
   "keywords": [],
   "author": "",
