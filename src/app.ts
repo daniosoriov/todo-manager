@@ -1,4 +1,5 @@
 import express from 'express'
+import helmet from 'helmet'
 import dotenv from 'dotenv'
 
 dotenv.config()
@@ -9,6 +10,7 @@ import logRequest from '@src/middleware/logRequest'
 const app = express()
 const port = 80
 
+app.use(helmet())
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
 
