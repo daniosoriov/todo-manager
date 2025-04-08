@@ -11,6 +11,7 @@ const app = express()
 const port = 80
 
 app.use(helmet())
+app.disable('x-powered-by')
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
 
