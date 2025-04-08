@@ -1,7 +1,7 @@
-import { paramStringRequired } from '@src/validators/commonValidators'
+import { paramTaskId } from '@src/validators/commonValidators'
 
 const getTaskValidators = [
-  paramStringRequired('taskId'),
+  paramTaskId(),
 ]
 
 export default getTaskValidators

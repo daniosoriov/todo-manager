@@ -18,6 +18,15 @@ const bodyStringRequired = (field: string) =>
         .withMessage(`'${field}' must be a string.`)
         .escape()
 
+const bodyStatusOptional = () =>
+    body('status')
+        .optional()
+        .isString()
+        .trim()
+        .isIn(taskStatus)
+        .withMessage('\'status\' must be one of: ' + taskStatus.join(', '))
+        .escape()
+
 const bodyStatus = () =>
     body('status')
         .default('pending')
@@ -28,31 +37,41 @@ const bodyStatus = () =>
         .isIn(taskStatus)
         .withMessage('\'status\' must be one of: ' + taskStatus.join(', '))
 
+const bodyDateOptional = (field: string) =>
+    body(field)
+        .optional()
+        .isISO8601()
+        .withMessage(`'${field}' must be a valid ISO8601 date.`)
+        .toDate()
+
 const bodyDateRequired = (field: string) =>
     body(field)
         .notEmpty()
         .withMessage(`'${field}' is required.`)
         .isISO8601()
         .withMessage(`'${field}' must be a valid ISO8601 date.`)
+        .toDate()
 
-const paramStringRequired = (field: string) =>
-    param(field)
+const paramTaskId = () =>
+    param('taskId')
         .notEmpty()
-        .withMessage(`'${field}' is required.`)
+        .withMessage(`'taskId' is required.`)
         .trim()
         .isString()
-        .withMessage(`'${field}' must be a string.`)
+        .withMessage(`'taskId' must be a string.`)
         .isLength({ min: 24, max: 24 })
-        .withMessage(`'${field}' must be a 24 character hex string.`)
+        .withMessage(`'taskId' must be a 24 character hex string.`)
         .isHexadecimal()
-        .withMessage(`'${field}' must be a hexadecimal string.`)
+        .withMessage(`'taskId' must be a hexadecimal string.`)
         .escape()
 
 export
 {
   bodyStringOptional,
   bodyStringRequired,
+  bodyStatusOptional,
   bodyStatus,
+  bodyDateOptional,
   bodyDateRequired,
-  paramStringRequired,
+  paramTaskId,
 }
