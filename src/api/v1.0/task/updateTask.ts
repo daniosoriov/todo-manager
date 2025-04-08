@@ -13,7 +13,7 @@ const updateTask = async (req: Request, res: Response) => {
     if (!task) {
       res.status(404).json({ error: 'Task not found' })
     }
-    res.status(200).json(task)
+    res.status(200).json({ message: 'Task updated successfully' })
   } catch (error) {
     console.error('Error updating task:', error)
     res.status(500).json({ error: 'Internal server error' })
