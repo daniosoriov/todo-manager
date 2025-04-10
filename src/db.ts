@@ -3,13 +3,13 @@ import mongoose from 'mongoose'
 const mongoDBUser = process.env.MONGODB_USER
 const mongoDBPassword = process.env.MONGODB_PASSWORD
 const mongoDBURI = process.env.MONGODB_URI
-const mongoDBCluster = process.env.MONGODB_CLUSTER
+const mongoDBDatabase = process.env.MONGODB_DB
 
-if (!mongoDBUser || !mongoDBPassword || !mongoDBURI || !mongoDBCluster) {
+if (!mongoDBUser || !mongoDBPassword || !mongoDBURI || !mongoDBDatabase) {
   throw new Error('Missing MongoDB connection environment variables')
 }
 
-const uri = `mongodb+srv://${mongoDBUser}:${mongoDBPassword}@${mongoDBURI}/?retryWrites=true&w=majority&appName=${mongoDBCluster}`
+const uri = `mongodb+srv://${mongoDBUser}:${mongoDBPassword}@${mongoDBURI}/?retryWrites=true&w=majority&appName=${mongoDBDatabase}`
 
 mongoose.connection.on('connected', () => console.log('[server] Mongoose connected'))
 mongoose.connection.on('open', () => console.log('[server] Mongoose open'))
