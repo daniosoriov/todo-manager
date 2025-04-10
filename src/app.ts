@@ -8,7 +8,7 @@ import { connectToDatabase } from '@src/db'
 import logRequest from '@src/middleware/logRequest'
 
 const app = express()
-const port = 80
+const port = parseInt(process.env.PORT || '3000', 10)
 
 app.use(helmet())
 app.disable('x-powered-by')
