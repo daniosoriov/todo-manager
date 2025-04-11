@@ -10,7 +10,7 @@ import updateTaskValidators from '@src/validators/updateTaskValidators'
 import deleteTaskValidators from '@src/validators/deleteTaskValidators'
 import fieldValidation from '@src/middleware/fieldValidation'
 
-const taskRouter = express.Router({ mergeParams: true })
+const taskRouter = express.Router()
 
 taskRouter.get('/', getAllTasks)
 taskRouter.get('/:taskId', getTaskValidators, fieldValidation, getTask)
