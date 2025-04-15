@@ -1,6 +1,8 @@
 import express from 'express'
-import { describe, it, expect, vi, beforeEach } from 'vitest'
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import supertest from 'supertest'
+import { connectInMemoryDB, disconnectInMemoryDB } from '@tests/utils/mongoMemoryServer'
+
 import createTask from '@src/api/v1.0/task/createTask'
 import fieldValidation from '@src/middleware/fieldValidation'
 import createTaskValidators from '@src/validators/createTaskValidators'
@@ -10,28 +12,15 @@ const app = express()
 app.use(express.json())
 const path = '/v1.0/task'
 
-const mockedTask = {
-  '_id': '67f5153450a07804c587f768',
-  title: 'Test task',
-  description: 'Test task description',
-  status: 'pending',
-  dueDate: '2026-03-23T00:00:00.000Z',
-  creationDate: '2025-04-08T12:23:16.476Z',
-  '__v': 0,
-}
-
-vi.mock('@src/models/Task', () => ({
-  default: {
-    create: vi.fn(),
-  },
-}))
-
 describe('Create Task Integration Success', () => {
   app.post(path, createTaskValidators, fieldValidation, createTask)
 
-  beforeEach(() => {
-    vi.clearAllMocks()
-    vi.mocked(Task.create).mockResolvedValueOnce(mockedTask)
+  beforeEach(async () => {
+    await connectInMemoryDB()
+  })
+
+  afterEach(async () => {
+    await disconnectInMemoryDB()
   })
 
   it('should create a task successfully', async () => {
@@ -42,10 +31,16 @@ describe('Create Task Integration Success', () => {
       dueDate: '2026-03-23T00:00:00.000Z',
     }
 
+    const taskCreateSpy = vi.spyOn(Task, 'create')
     const response = await supertest(app).post(path).send(payload)
     expect(response.status).toBe(201)
-    expect(response.body).toEqual(mockedTask)
-    expect(Task.create).toHaveBeenCalledWith(payload)
+    const newTask = response.body
+    expect(newTask).toHaveProperty('_id')
+    expect(newTask).toHaveProperty('title', payload.title)
+    expect(newTask).toHaveProperty('description', payload.description)
+    expect(newTask).toHaveProperty('status', payload.status)
+    expect(newTask).toHaveProperty('dueDate', payload.dueDate)
+    expect(taskCreateSpy).toHaveBeenCalledWith(payload)
   })
 
   it('should create a task even with no description', async () => {
@@ -55,10 +50,13 @@ describe('Create Task Integration Success', () => {
       dueDate: '2026-03-23T00:00:00.000Z',
     }
 
+    const taskCreateSpy = vi.spyOn(Task, 'create')
     const response = await supertest(app).post(path).send(payload)
     expect(response.status).toBe(201)
-    expect(response.body).toEqual(mockedTask)
-    expect(Task.create).toHaveBeenCalledWith(payload)
+    const newTask = response.body
+    expect(newTask).toHaveProperty('_id')
+    expect(newTask.description).toBeUndefined()
+    expect(taskCreateSpy).toHaveBeenCalledWith(payload)
   })
 
   it('should create a task even with no status', async () => {
@@ -68,10 +66,13 @@ describe('Create Task Integration Success', () => {
       dueDate: '2026-03-23T00:00:00.000Z',
     }
 
+    const taskCreateSpy = vi.spyOn(Task, 'create')
     const response = await supertest(app).post(path).send(payload)
     expect(response.status).toBe(201)
-    expect(response.body).toEqual(mockedTask)
-    expect(Task.create).toHaveBeenCalledWith({ ...payload, status: 'pending' })
+    const newTask = response.body
+    expect(newTask).toHaveProperty('_id')
+    expect(newTask).toHaveProperty('status', 'pending')
+    expect(taskCreateSpy).toHaveBeenCalledWith({ ...payload, status: 'pending' })
   })
 
   it('should create a task even with no description and status', async () => {
@@ -80,10 +81,14 @@ describe('Create Task Integration Success', () => {
       dueDate: '2026-03-23T00:00:00.000Z',
     }
 
+    const taskCreateSpy = vi.spyOn(Task, 'create')
     const response = await supertest(app).post(path).send(payload)
     expect(response.status).toBe(201)
-    expect(response.body).toEqual(mockedTask)
-    expect(Task.create).toHaveBeenCalledWith({ ...payload, status: 'pending' })
+    const newTask = response.body
+    expect(newTask).toHaveProperty('_id')
+    expect(newTask.description).toBeUndefined()
+    expect(newTask).toHaveProperty('status', 'pending')
+    expect(taskCreateSpy).toHaveBeenCalledWith({ ...payload, status: 'pending' })
   })
 })
 
