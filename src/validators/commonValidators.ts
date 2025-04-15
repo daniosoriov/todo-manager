@@ -1,6 +1,5 @@
 import { body, param } from 'express-validator'
 import { taskStatus } from '@src/types/types'
-import * as console from 'node:console'
 
 const bodyStringOptional = (field: string) =>
     body(field)
