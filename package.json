@@ -34,6 +34,7 @@
     "express-validator": "^7.2.1",
     "helmet": "^8.1.0",
     "mongodb": "^6.15.0",
+    "mongodb-memory-server": "^10.1.4",
     "mongoose": "^8.13.2"
   },
   "devDependencies": {
