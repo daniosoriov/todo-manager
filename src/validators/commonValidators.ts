@@ -1,5 +1,6 @@
 import { body, param } from 'express-validator'
 import { taskStatus } from '@src/types/types'
+import * as console from 'node:console'
 
 const bodyStringOptional = (field: string) =>
     body(field)
@@ -49,6 +50,10 @@ const bodyDateRequired = (field: string) =>
         .withMessage(`'${field}' is required.`)
         .isISO8601()
         .withMessage(`'${field}' must be a valid ISO8601 date.`)
+        .custom((value) => {
+          return new Date(value) > new Date()
+        })
+        .withMessage(`'${field}' must be in the future.`)
 
 const paramTaskId = () =>
     param('taskId')

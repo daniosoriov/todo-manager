@@ -1,7 +1,8 @@
 import express from 'express'
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
+import { describe, it, expect, vi, beforeAll, afterAll } from 'vitest'
 import supertest from 'supertest'
 import { connectInMemoryDB, disconnectInMemoryDB } from '@tests/utils/mongoMemoryServer'
+import expectExpressValidatorError from '../../utils/expectExpressValidatorError'
 
 import createTask from '@src/api/v1.0/task/createTask'
 import fieldValidation from '@src/middleware/fieldValidation'
@@ -11,15 +12,14 @@ import Task from '@src/models/Task'
 const app = express()
 app.use(express.json())
 const path = '/v1.0/task'
+app.post(path, createTaskValidators, fieldValidation, createTask)
 
-describe('Create Task Integration Success', () => {
-  app.post(path, createTaskValidators, fieldValidation, createTask)
-
-  beforeEach(async () => {
+describe('Successful cases', () => {
+  beforeAll(async () => {
     await connectInMemoryDB()
   })
 
-  afterEach(async () => {
+  afterAll(async () => {
     await disconnectInMemoryDB()
   })
 
@@ -92,22 +92,81 @@ describe('Create Task Integration Success', () => {
   })
 })
 
-describe('Create Task Integration Fail', () => {
-  it('should fail when no title is provided', async () => {
-    const response = await supertest(app).post(path).send({ description: 'Test task' })
+describe('Validation Errors', () => {
+  describe('Missing Fields', () => {
+    it('should fail when no payload is provided', async () => {
+      const response = await supertest(app).post(path).send({})
 
-    expect(response.status).toBe(400)
-    expect(response.body).toHaveProperty('errors')
-    const found = response.body.errors.some((error: any) => error.path === 'title' && error.location === 'body')
-    expect(found).toBe(true)
+      expect(response.status).toBe(400)
+      expect(response.body).toHaveProperty('errors')
+      expectExpressValidatorError(response, 'title')
+      expectExpressValidatorError(response, 'dueDate')
+    })
+
+    it('should fail when no title is provided', async () => {
+      const response = await supertest(app).post(path).send({ description: 'Test task' })
+
+      expect(response.status).toBe(400)
+      expect(response.body).toHaveProperty('errors')
+      expectExpressValidatorError(response, 'title')
+    })
+
+    it('should fail when no dueDate is provided', async () => {
+      const response = await supertest(app).post(path).send({ title: 'Test task' })
+
+      expect(response.status).toBe(400)
+      expect(response.body).toHaveProperty('errors')
+      expectExpressValidatorError(response, 'dueDate')
+    })
   })
 
-  it('should fail when no dueDate is provided', async () => {
-    const response = await supertest(app).post(path).send({ title: 'Test task' })
+  describe('Empty Fields', () => {
+    it('should fail when title is empty', async () => {
+      const response = await supertest(app).post(path).send({ title: '', description: 'Test task' })
 
-    expect(response.status).toBe(400)
-    expect(response.body).toHaveProperty('errors')
-    const found = response.body.errors.some((error: any) => error.path === 'dueDate' && error.location === 'body')
-    expect(found).toBe(true)
+      expect(response.status).toBe(400)
+      expect(response.body).toHaveProperty('errors')
+      expectExpressValidatorError(response, 'title')
+    })
+
+    it('should fail when dueDate is empty', async () => {
+      const response = await supertest(app).post(path).send({ title: 'Test task', dueDate: '' })
+
+      expect(response.status).toBe(400)
+      expect(response.body).toHaveProperty('errors')
+      expectExpressValidatorError(response, 'dueDate')
+    })
+  })
+
+  describe('status', () => {
+    it('should fail when status is not a valid enum value', async () => {
+      const response = await supertest(app).post(path).send({
+        title: 'Test task',
+        dueDate: '2026-03-23T00:00:00.000Z',
+        status: 'invalidStatus',
+      })
+
+      expect(response.status).toBe(400)
+      expect(response.body).toHaveProperty('errors')
+      expectExpressValidatorError(response, 'status')
+    })
+  })
+
+  describe('dueDate', () => {
+    it('should fail when dueDate is not a valid date', async () => {
+      const response = await supertest(app).post(path).send({ title: 'Test task', dueDate: 'not valid date' })
+
+      expect(response.status).toBe(400)
+      expect(response.body).toHaveProperty('errors')
+      expectExpressValidatorError(response, 'dueDate')
+    })
+
+    it('should fail when dueDate is in the past', async () => {
+      const response = await supertest(app).post(path).send({ title: 'Test task', dueDate: '1990-03-23T00:00:00.000Z' })
+
+      expect(response.status).toBe(400)
+      expect(response.body).toHaveProperty('errors')
+      expectExpressValidatorError(response, 'dueDate')
+    })
   })
 })
