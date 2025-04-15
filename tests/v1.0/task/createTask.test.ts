@@ -7,6 +7,7 @@ import Task from '@src/models/Task'
 const app = express()
 app.use(express.json())
 const path = '/v1.0/task'
+app.post(path, createTask)
 
 const mockedTask = {
   '_id': '67f5153450a07804c587f768',
@@ -24,12 +25,10 @@ vi.mock('@src/models/Task', () => ({
   },
 }))
 
-describe('Create Task Success', () => {
-  app.post(path, createTask)
-
+describe('Successful cases', () => {
   beforeEach(() => {
     vi.clearAllMocks()
-    vi.mocked(Task.create).mockResolvedValueOnce(mockedTask)
+    vi.mocked(Task.create).mockResolvedValueOnce({ ...mockedTask, toObject: () => mockedTask } as any)
   })
 
   it('should create a task successfully', async () => {
@@ -85,74 +84,78 @@ describe('Create Task Success', () => {
   })
 })
 
-describe('Create Task Fail', () => {
+describe('Validation Errors', () => {
 
   beforeEach(() => {
     vi.clearAllMocks()
   })
 
-  // Payload errors
-  it('should fail when no payload is provided', async () => {
-    vi.mocked(Task.create).mockRejectedValueOnce(new Error('Task validation failed: payload is required'))
-    const response = await supertest(app).post(path).send({})
+  describe('payload', () => {
+    it('should fail when no payload is provided', async () => {
+      vi.mocked(Task.create).mockRejectedValueOnce(new Error('Task validation failed: payload is required'))
+      const response = await supertest(app).post(path).send({})
 
-    expect(response.status).toBe(500)
-    expect(response.body).toHaveProperty('error', 'Internal server error')
+      expect(response.status).toBe(500)
+      expect(response.body).toHaveProperty('error', 'Internal server error')
+    })
+
+    it('should fail when payload contains invalid fields', async () => {
+      vi.mocked(Task.create).mockRejectedValueOnce(new Error('Task validation failed: invalid fields'))
+
+      const response = await supertest(app).post(path).send({ title: 'Test task', invalidField: 'invalid' })
+
+      expect(response.status).toBe(500)
+      expect(response.body).toHaveProperty('error', 'Internal server error')
+    })
   })
 
-  it('should fail when payload contains invalid fields', async () => {
-    vi.mocked(Task.create).mockRejectedValueOnce(new Error('Task validation failed: invalid fields'))
 
-    const response = await supertest(app).post(path).send({ title: 'Test task', invalidField: 'invalid' })
+  describe('title', () => {
+    it('should fail when no title is provided', async () => {
+      vi.mocked(Task.create).mockRejectedValueOnce(new Error('Task validation failed: title is required'))
 
-    expect(response.status).toBe(500)
-    expect(response.body).toHaveProperty('error', 'Internal server error')
+      const response = await supertest(app).post(path).send({ description: 'Test task' })
+
+      expect(response.status).toBe(500)
+      expect(response.body).toHaveProperty('error', 'Internal server error')
+    })
+
+    it('should fail when title is not a string', async () => {
+      vi.mocked(Task.create).mockRejectedValueOnce(new Error('Task validation failed: title must be a string'))
+
+      const response = await supertest(app).post(path).send({ title: 123, description: 'Test task' })
+
+      expect(response.status).toBe(500)
+      expect(response.body).toHaveProperty('error', 'Internal server error')
+    })
   })
 
-  // Title errors
-  it('should fail when no title is provided', async () => {
-    vi.mocked(Task.create).mockRejectedValueOnce(new Error('Task validation failed: title is required'))
+  describe('dueDate', () => {
+    it('should fail when no dueDate is provided', async () => {
+      vi.mocked(Task.create).mockRejectedValueOnce(new Error('Task validation failed: dueDate is required'))
 
-    const response = await supertest(app).post(path).send({ description: 'Test task' })
+      const response = await supertest(app).post(path).send({ title: 'Test task' })
 
-    expect(response.status).toBe(500)
-    expect(response.body).toHaveProperty('error', 'Internal server error')
-  })
+      expect(response.status).toBe(500)
+      expect(response.body).toHaveProperty('error', 'Internal server error')
+    })
 
-  it('should fail when title is not a string', async () => {
-    vi.mocked(Task.create).mockRejectedValueOnce(new Error('Task validation failed: title must be a string'))
+    it('should fail when dueDate is not a date', async () => {
+      vi.mocked(Task.create).mockRejectedValueOnce(new Error('Task validation failed: dueDate must be a valid date'))
 
-    const response = await supertest(app).post(path).send({ title: 123, description: 'Test task' })
+      const response = await supertest(app).post(path).send({ title: 'Test task', dueDate: 'invalid-date' })
 
-    expect(response.status).toBe(500)
-    expect(response.body).toHaveProperty('error', 'Internal server error')
-  })
+      expect(response.status).toBe(500)
+      expect(response.body).toHaveProperty('error', 'Internal server error')
+    })
 
-  // DueDate errors
-  it('should fail when no dueDate is provided', async () => {
-    vi.mocked(Task.create).mockRejectedValueOnce(new Error('Task validation failed: dueDate is required'))
+    it('should fail when dueDate is in the past', async () => {
+      vi.mocked(Task.create).mockRejectedValueOnce(new Error('Task validation failed: dueDate cannot be in the past'))
 
-    const response = await supertest(app).post(path).send({ title: 'Test task' })
+      const response = await supertest(app).post(path).send({ title: 'Test task', dueDate: '1990-01-01T00:00:00.000Z' })
 
-    expect(response.status).toBe(500)
-    expect(response.body).toHaveProperty('error', 'Internal server error')
-  })
-
-  it('should fail when dueDate is not a date', async () => {
-    vi.mocked(Task.create).mockRejectedValueOnce(new Error('Task validation failed: dueDate must be a valid date'))
-
-    const response = await supertest(app).post(path).send({ title: 'Test task', dueDate: 'invalid-date' })
-
-    expect(response.status).toBe(500)
-    expect(response.body).toHaveProperty('error', 'Internal server error')
-  })
-
-  it('should fail when dueDate is in the past', async () => {
-    vi.mocked(Task.create).mockRejectedValueOnce(new Error('Task validation failed: dueDate cannot be in the past'))
-
-    const response = await supertest(app).post(path).send({ title: 'Test task', dueDate: '1990-01-01T00:00:00.000Z' })
-
-    expect(response.status).toBe(500)
-    expect(response.body).toHaveProperty('error', 'Internal server error')
+      expect(response.status).toBe(500)
+      expect(response.body).toHaveProperty('error', 'Internal server error')
+    })
   })
 })
