@@ -14,7 +14,7 @@ app.use(express.json())
 const path = '/v1.0/task'
 app.post(path, createTaskValidators, fieldValidation, createTask)
 
-describe('Successful cases', () => {
+describe('Successful Cases', () => {
   beforeAll(async () => {
     await connectInMemoryDB()
   })
