@@ -71,4 +71,21 @@ describe('Failure Cases', () => {
     expect(response.status).toBe(404)
     expect(response.body).toEqual({ error: 'Task not found' })
   })
+
+  it('should fail when no taskId is provided', async () => {
+    const response = await supertest(app).get(path.replace(':taskId', ''))
+    expect(response.status).toBe(404)
+    expect(response.body).toEqual({})
+  })
+
+  it('should return a 500 error for database error', async () => {
+    const taskId = '603d2f4e4f1a2c001f8b4567'
+    vi.spyOn(Task, 'findById').mockImplementationOnce(() => {
+      throw new Error('Database error')
+    })
+
+    const response = await supertest(app).get(path.replace(':taskId', taskId))
+    expect(response.status).toBe(500)
+    expect(response.body).toEqual({ error: 'Internal Server Error' })
+  })
 })
