@@ -16,7 +16,7 @@ app.get(path, getTaskValidators, fieldValidation, getTask)
 
 const taskFindByIdSpy = vi.spyOn(Task, 'findById')
 
-describe('Get Task Integration', () => {
+describe('Get Task Integration Tests', () => {
   beforeAll(async () => {
     await connectInMemoryDB()
   })

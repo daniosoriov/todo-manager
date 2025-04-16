@@ -16,7 +16,7 @@ app.delete(path, deleteTaskValidators, fieldValidation, deleteTask)
 
 const taskFindByIdAndDeleteSpy = vi.spyOn(Task, 'findByIdAndDelete')
 
-describe('Delete Task Integration', () => {
+describe('Delete Task Integration Tests', () => {
   beforeAll(async () => {
     await connectInMemoryDB()
   })

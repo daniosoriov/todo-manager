@@ -32,7 +32,7 @@ async function successfulUpdate(payload: Partial<typeof Task.schema.obj>) {
   expect(taskFindByIdAndUpdateSpy).toHaveBeenCalledWith(taskId, payload, { new: true })
 }
 
-describe('Update Task Integration', () => {
+describe('Update Task Integration Tests', () => {
   beforeAll(async () => {
     await connectInMemoryDB()
   })
