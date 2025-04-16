@@ -9,13 +9,14 @@ import getTaskValidators from '@src/validators/getTaskValidators'
 import updateTaskValidators from '@src/validators/updateTaskValidators'
 import deleteTaskValidators from '@src/validators/deleteTaskValidators'
 import fieldValidation from '@src/middleware/fieldValidation'
+import updateTaskFieldValidation from '@src/middleware/updateTaskFieldValidation'
 
 const taskRouter = express.Router()
 
 taskRouter.get('/', getAllTasks)
 taskRouter.get('/:taskId', getTaskValidators, fieldValidation, getTask)
 taskRouter.post('/', createTaskValidators, fieldValidation, createTask)
-taskRouter.put('/:taskId', updateTaskValidators, fieldValidation, updateTask)
+taskRouter.put('/:taskId', updateTaskFieldValidation, updateTaskValidators, fieldValidation, updateTask)
 taskRouter.delete('/:taskId', deleteTaskValidators, fieldValidation, deleteTask)
 
 export default taskRouter
