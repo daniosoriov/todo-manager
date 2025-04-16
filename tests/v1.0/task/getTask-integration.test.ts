@@ -34,6 +34,7 @@ describe('Successful Cases', () => {
     })
 
     const taskId = mockedTask._id.toString()
+    const taskFindByIdSpy = vi.spyOn(Task, 'findById')
     const response = await supertest(app).get(path.replace(':taskId', taskId))
 
     expect(response.status).toBe(200)
@@ -46,6 +47,7 @@ describe('Successful Cases', () => {
       creationDate: mockedTask.creationDate.toISOString(),
       __v: mockedTask.__v,
     })
+    expect(taskFindByIdSpy).toHaveBeenCalledWith(taskId)
   })
 })
 
