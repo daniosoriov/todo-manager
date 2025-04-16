@@ -44,6 +44,7 @@ describe('Delete Task Integration', () => {
       const response = await supertest(app).delete(path.replace(':taskId', taskId))
       expect(response.status).toBe(200)
       expect(response.body).toEqual({ message: 'Task deleted successfully' })
+      expect(taskFindByIdAndDeleteSpy).toHaveBeenCalledWith(taskId)
     })
   })
 
@@ -53,19 +54,23 @@ describe('Delete Task Integration', () => {
       const response = await supertest(app).delete(path.replace(':taskId', nonExistentTaskId))
       expect(response.status).toBe(404)
       expect(response.body).toEqual({ error: 'Task not found' })
+      expect(taskFindByIdAndDeleteSpy).toHaveBeenCalledWith(nonExistentTaskId)
     })
 
     it('should return a 400 error for invalid taskId format', async () => {
       const response = await supertest(app).delete(path.replace(':taskId', 'invalidTaskId'))
       expect(response.status).toBe(400)
       expectExpressValidatorError(response, 'taskId', 'params')
+      expect(taskFindByIdAndDeleteSpy).not.toHaveBeenCalled()
     })
 
     it('should return a 500 error if there is a database error', async () => {
       taskFindByIdAndDeleteSpy.mockRejectedValueOnce(new Error('Server error'))
-      const response = await supertest(app).delete(path.replace(':taskId', '67ff95ce036a26e20e4b3303'))
+      const taskId = '67ff95ce036a26e20e4b3303'
+      const response = await supertest(app).delete(path.replace(':taskId', taskId))
       expect(response.status).toBe(500)
       expect(response.body).toEqual({ error: 'Internal Server Error' })
+      expect(taskFindByIdAndDeleteSpy).toHaveBeenCalledWith(taskId)
     })
   })
 })
