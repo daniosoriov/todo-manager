@@ -5,7 +5,7 @@ import { connectInMemoryDB, disconnectInMemoryDB } from '@tests/utils/mongoMemor
 import expectExpressValidatorError from '../../utils/expectExpressValidatorError'
 
 import updateTask from '@src/api/v1.0/task/updateTask'
-import updateTaskFieldValidation from '@src/middleware/updateTaskFieldValidation'
+import validFieldsOnly from '../../../src/middleware/validFieldsOnly'
 import fieldValidation from '@src/middleware/fieldValidation'
 import updateTaskValidators from '@src/validators/updateTaskValidators'
 import Task from '@src/models/Task'
@@ -13,7 +13,7 @@ import Task from '@src/models/Task'
 const app = express()
 app.use(express.json())
 const path = '/v1.0/task/:taskId'
-app.put(path, updateTaskFieldValidation, updateTaskValidators, fieldValidation, updateTask)
+app.put(path, validFieldsOnly, updateTaskValidators, fieldValidation, updateTask)
 
 const mockedTask = {
   title: 'Test task',
