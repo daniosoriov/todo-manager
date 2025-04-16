@@ -6,7 +6,7 @@ const updateTask = async (req: Request, res: Response, next: NextFunction) => {
   const taskUpdates = req.body
   if (!taskUpdates || Object.keys(taskUpdates).length === 0) {
     res.status(400).json({ error: 'No updates provided' })
-    throw new Error('No updates provided')
+    return next(new Error('No updates provided'))
   }
 
   try {
