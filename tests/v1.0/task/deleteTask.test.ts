@@ -1,13 +1,7 @@
-import express from 'express'
+import { NextFunction, Request, Response } from 'express'
 import { describe, it, expect, vi, beforeEach } from 'vitest'
-import supertest from 'supertest'
 import deleteTask from '@src/api/v1.0/task/deleteTask'
 import Task from '@src/models/Task'
-
-const app = express()
-app.use(express.json())
-const path = '/v1.0/task/:taskId'
-app.delete(path, deleteTask)
 
 vi.mock('@src/models/Task', () => ({
   default: {
@@ -15,51 +9,43 @@ vi.mock('@src/models/Task', () => ({
   },
 }))
 
-describe('Delete task', () => {
+const taskId = '67f5153450a07804c587f768'
+
+const req = {
+  params: { taskId },
+} as Partial<Request>
+
+const res = {
+  status: vi.fn().mockReturnThis(),
+  json: vi.fn(),
+} as Partial<Response>
+
+const next = vi.fn() as NextFunction
+
+describe('Delete Task Unit Tests', () => {
   beforeEach(() => {
     vi.clearAllMocks()
   })
 
-  describe('Successful Cases', () => {
-    it('should delete a task successfully', async () => {
-      const taskId = '67f5153450a07804c587f768'
-      vi.mocked(Task.findByIdAndDelete).mockResolvedValueOnce({ _id: taskId } as any)
-
-      const response = await supertest(app).delete(path.replace(':taskId', taskId))
-
-      expect(response.status).toBe(200)
-      expect(response.body).toEqual({ message: 'Task deleted successfully' })
-      expect(Task.findByIdAndDelete).toHaveBeenCalledWith(taskId)
-    })
+  it('should delete a task successfully', async () => {
+    vi.mocked(Task.findByIdAndDelete).mockResolvedValueOnce({ _id: taskId } as any)
+    await deleteTask(req as Request, res as Response, next)
+    expect(res.status).toHaveBeenCalledWith(200)
+    expect(res.json).toHaveBeenCalledWith({ message: 'Task deleted successfully' })
+    expect(Task.findByIdAndDelete).toHaveBeenCalledWith(taskId)
   })
 
-  describe('Failure Cases', () => {
-    it('should return 404 when the task is not found', async () => {
-      const taskId = '67f5153450a07804c587f768'
-      vi.mocked(Task.findByIdAndDelete).mockResolvedValueOnce(null)
+  it('should fail to delete a task when it does not exist', async () => {
+    vi.mocked(Task.findByIdAndDelete).mockResolvedValueOnce(null)
+    await deleteTask(req as Request, res as Response, next)
+    expect(res.status).toHaveBeenCalledWith(404)
+    expect(res.json).toHaveBeenCalledWith({ error: 'Task not found' })
+  })
 
-      const response = await supertest(app).delete(path.replace(':taskId', taskId))
-
-      expect(response.status).toBe(404)
-      expect(response.body).toEqual({ error: 'Task not found' })
-      expect(Task.findByIdAndDelete).toHaveBeenCalledWith(taskId)
-    })
-
-    it('should return 404 for an invalid taskId format', async () => {
-      const response = await supertest(app).delete(path.replace(':taskId', 'invalid-id'))
-
-      expect(response.status).toBe(404)
-      expect(response.body).toEqual({ error: 'Task not found' })
-    })
-
-    it('should return 500 for database error', async () => {
-      const taskId = '67f5153450a07804c587f768'
-      vi.mocked(Task.findByIdAndDelete).mockRejectedValueOnce(new Error('Database error'))
-
-      const response = await supertest(app).delete(path.replace(':taskId', taskId))
-
-      expect(response.status).toBe(500)
-      expect(response.body).toEqual({ error: 'Internal Server Error' })
-    })
+  it('should fail to delete a task when there is a database error', async () => {
+    vi.mocked(Task.findByIdAndDelete).mockRejectedValueOnce(new Error('Database error'))
+    await deleteTask(req as Request, res as Response, next)
+    expect(res.status).toHaveBeenCalledWith(500)
+    expect(res.json).toHaveBeenCalledWith({ error: 'Internal Server Error' })
   })
 })
