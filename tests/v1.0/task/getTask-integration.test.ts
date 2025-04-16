@@ -1,5 +1,5 @@
 import express from 'express'
-import { describe, it, expect, vi, beforeAll, afterAll } from 'vitest'
+import { describe, it, expect, vi, beforeAll, afterAll, beforeEach } from 'vitest'
 import supertest from 'supertest'
 import { connectInMemoryDB, disconnectInMemoryDB } from '@tests/utils/mongoMemoryServer'
 import expectExpressValidatorError from '../../utils/expectExpressValidatorError'
@@ -14,9 +14,15 @@ app.use(express.json())
 const path = '/v1.0/task/:taskId'
 app.get(path, getTaskValidators, fieldValidation, getTask)
 
+const taskFindByIdSpy = vi.spyOn(Task, 'findById')
+
 describe('Get Task Integration', () => {
   beforeAll(async () => {
     await connectInMemoryDB()
+  })
+
+  beforeEach(() => {
+    vi.clearAllMocks()
   })
 
   afterAll(async () => {
@@ -35,7 +41,6 @@ describe('Get Task Integration', () => {
       })
 
       const taskId = mockedTask._id.toString()
-      const taskFindByIdSpy = vi.spyOn(Task, 'findById')
       const response = await supertest(app).get(path.replace(':taskId', taskId))
 
       expect(response.status).toBe(200)
@@ -57,6 +62,7 @@ describe('Get Task Integration', () => {
       const response = await supertest(app).get(path.replace(':taskId', 'invalidTaskId'))
       expect(response.status).toBe(400)
       expectExpressValidatorError(response, 'taskId', 'params')
+      expect(taskFindByIdSpy).not.toHaveBeenCalled()
     })
 
     it('should return a 404 error for non-existing taskId', async () => {
@@ -64,23 +70,25 @@ describe('Get Task Integration', () => {
       const response = await supertest(app).get(path.replace(':taskId', nonExistingTaskId))
       expect(response.status).toBe(404)
       expect(response.body).toEqual({ error: 'Task not found' })
+      expect(taskFindByIdSpy).toHaveBeenCalledWith(nonExistingTaskId)
     })
 
     it('should fail when no taskId is provided', async () => {
       const response = await supertest(app).get(path.replace(':taskId', ''))
       expect(response.status).toBe(404)
       expect(response.body).toEqual({})
+      expect(taskFindByIdSpy).not.toHaveBeenCalled()
     })
 
     it('should return a 500 error for database error', async () => {
       const taskId = '603d2f4e4f1a2c001f8b4567'
-      vi.spyOn(Task, 'findById').mockImplementationOnce(() => {
+      taskFindByIdSpy.mockImplementationOnce(() => {
         throw new Error('Database error')
       })
-
       const response = await supertest(app).get(path.replace(':taskId', taskId))
       expect(response.status).toBe(500)
       expect(response.body).toEqual({ error: 'Internal Server Error' })
+      expect(taskFindByIdSpy).toHaveBeenCalledWith(taskId)
     })
   })
 })
