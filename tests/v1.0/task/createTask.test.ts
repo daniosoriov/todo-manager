@@ -1,5 +1,6 @@
 import { Request, Response } from 'express'
 import { describe, it, expect, vi, beforeEach } from 'vitest'
+import { res } from '@tests/utils/unitTestSetup'
 import createTask from '@src/api/v1.0/task/createTask'
 import Task from '@src/models/Task'
 
@@ -17,11 +18,6 @@ const req = {
     dueDate: '2026-03-23T00:00:00.000Z',
   },
 } as Partial<Request>
-
-const res = {
-  status: vi.fn().mockReturnThis(),
-  json: vi.fn(),
-} as Partial<Response>
 
 describe('Create Task Unit Tests', () => {
   beforeEach(() => {

@@ -1,5 +1,6 @@
-import { NextFunction, Request, Response } from 'express'
+import { Request, Response } from 'express'
 import { describe, it, expect, vi, beforeEach } from 'vitest'
+import { req, res, next, taskId } from '@tests/utils/unitTestSetup'
 import deleteTask from '@src/api/v1.0/task/deleteTask'
 import Task from '@src/models/Task'
 
@@ -8,19 +9,6 @@ vi.mock('@src/models/Task', () => ({
     findByIdAndDelete: vi.fn(),
   },
 }))
-
-const taskId = '67f5153450a07804c587f768'
-
-const req = {
-  params: { taskId },
-} as Partial<Request>
-
-const res = {
-  status: vi.fn().mockReturnThis(),
-  json: vi.fn(),
-} as Partial<Response>
-
-const next = vi.fn() as NextFunction
 
 describe('Delete Task Unit Tests', () => {
   beforeEach(() => {

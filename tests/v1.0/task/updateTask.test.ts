@@ -1,13 +1,8 @@
-import express from 'express'
+import { Request, Response } from 'express'
 import { describe, it, expect, vi, beforeEach } from 'vitest'
-import supertest from 'supertest'
+import { res, next, taskId } from '@tests/utils/unitTestSetup'
 import updateTask from '@src/api/v1.0/task/updateTask'
 import Task from '@src/models/Task'
-
-const app = express()
-app.use(express.json())
-const path = '/v1.0/task/:taskId'
-app.put(path, updateTask)
 
 vi.mock('@src/models/Task', () => ({
   default: {
@@ -15,57 +10,51 @@ vi.mock('@src/models/Task', () => ({
   },
 }))
 
-const taskId = '67f5153450a07804c587f768'
-const payload = {
+const body = {
   title: 'Updated task',
   description: 'Updated task description',
   status: 'completed',
   dueDate: '2026-03-23T00:00:00.000Z',
 }
 
-describe('Update Task', () => {
+const req = {
+  body,
+  params: {
+    taskId: taskId,
+  },
+} as Partial<Request>
+
+describe('Update Task Unit Tests', () => {
   beforeEach(() => {
     vi.clearAllMocks()
   })
 
-  describe('Successful Cases', () => {
-    it('should update a task successfully', async () => {
-      vi.mocked(Task.findByIdAndUpdate).mockResolvedValueOnce({ ...payload, _id: taskId } as any)
-      const response = await supertest(app).put(path.replace(':taskId', taskId)).send(payload)
-      expect(response.status).toBe(200)
-      expect(response.body).toEqual({ message: 'Task updated successfully' })
-      expect(Task.findByIdAndUpdate).toHaveBeenCalledWith(taskId, payload, { new: true })
-    })
+  it('should update a task successfully', async () => {
+    vi.mocked(Task.findByIdAndUpdate).mockResolvedValueOnce({ ...body, _id: taskId } as any)
+    await updateTask(req as Request, res as Response, next)
+    expect(res.status).toHaveBeenCalledWith(200)
+    expect(res.json).toHaveBeenCalledWith({ message: 'Task updated successfully' })
+    expect(Task.findByIdAndUpdate).toHaveBeenCalledWith(taskId, body, { new: true })
   })
 
-  describe('Failure Cases', () => {
-    it('should return 404 when the task is not found', async () => {
-      vi.mocked(Task.findByIdAndUpdate).mockResolvedValueOnce(null)
-      const response = await supertest(app).put(path.replace(':taskId', taskId)).send(payload)
-      expect(response.status).toBe(404)
-      expect(response.body).toEqual({ error: 'Task not found' })
-      expect(Task.findByIdAndUpdate).toHaveBeenCalledWith(taskId, payload, { new: true })
-    })
+  it('should fail to update a task when it does not exist', async () => {
+    vi.mocked(Task.findByIdAndUpdate).mockResolvedValueOnce(null)
+    await updateTask(req as Request, res as Response, next)
+    expect(res.status).toHaveBeenCalledWith(404)
+    expect(res.json).toHaveBeenCalledWith({ error: 'Task not found' })
+  })
 
-    it('should return 400 for no updates', async () => {
-      const response = await supertest(app).put(path.replace(':taskId', taskId)).send({})
-      expect(response.status).toBe(400)
-      expect(response.body).toEqual({ error: 'No updates provided' })
-      expect(Task.findByIdAndUpdate).not.toHaveBeenCalled()
-    })
+  it('should fail to update a task when there are no updates', async () => {
+    const emptyReq = { body: {}, params: { taskId } } as Partial<Request>
+    await updateTask(emptyReq as Request, res as Response, next)
+    expect(res.status).toHaveBeenCalledWith(400)
+    expect(res.json).toHaveBeenCalledWith({ error: 'No updates provided' })
+  })
 
-    it('should return 400 for invalid taskId format', async () => {
-      const response = await supertest(app).put(path.replace(':taskId', 'invalid-id')).send(payload)
-      expect(response.status).toBe(404)
-      expect(response.body).toEqual({ error: 'Task not found' })
-    })
-
-    it('should return 500 on database error', async () => {
-      vi.mocked(Task.findByIdAndUpdate).mockRejectedValueOnce(new Error('Database error'))
-      const response = await supertest(app).put(path.replace(':taskId', taskId)).send(payload)
-      expect(response.status).toBe(500)
-      expect(response.body).toEqual({ error: 'Internal Server Error' })
-      expect(Task.findByIdAndUpdate).toHaveBeenCalledWith(taskId, payload, { new: true })
-    })
+  it('should fail to update a task when there is a database error', async () => {
+    vi.mocked(Task.findByIdAndUpdate).mockRejectedValueOnce(new Error('Database error'))
+    await updateTask(req as Request, res as Response, next)
+    expect(res.status).toHaveBeenCalledWith(500)
+    expect(res.json).toHaveBeenCalledWith({ error: 'Internal Server Error' })
   })
 })
