@@ -18,7 +18,7 @@ const updateTask = async (req: Request, res: Response, next: NextFunction) => {
     res.status(200).json({ message: 'Task updated successfully' })
   } catch (error) {
     console.error('Error updating task:', error)
-    res.status(500).json({ error: 'Internal server error' })
+    res.status(500).json({ error: 'Internal Server Error' })
   }
 }
 

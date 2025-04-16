@@ -8,7 +8,7 @@ const createTask = async (req: Request, res: Response) => {
     res.status(201).json(newTask)
   } catch (error) {
     console.error('Error creating task:', error)
-    res.status(500).json({ error: 'Internal server error' })
+    res.status(500).json({ error: 'Internal Server Error' })
   }
 }
 
