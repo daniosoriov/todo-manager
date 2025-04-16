@@ -42,6 +42,10 @@ const bodyDateOptional = (field: string) =>
         .optional()
         .isISO8601()
         .withMessage(`'${field}' must be a valid ISO8601 date.`)
+        .custom((value) => {
+          return new Date(value) > new Date()
+        })
+        .withMessage(`'${field}' must be in the future.`)
 
 const bodyDateRequired = (field: string) =>
     body(field)
