@@ -14,7 +14,7 @@ app.use(express.json())
 const path = '/v1.0/task/:taskId'
 app.get(path, getTaskValidators, fieldValidation, getTask)
 
-describe('Get Task', () => {
+describe('Get Task Integration', () => {
   beforeAll(async () => {
     await connectInMemoryDB()
   })

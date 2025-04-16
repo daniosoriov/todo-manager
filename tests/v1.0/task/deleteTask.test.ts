@@ -33,7 +33,7 @@ describe('Delete task', () => {
     })
   })
 
-  describe('Validation Errors', () => {
+  describe('Failure Cases', () => {
     it('should return 404 when the task is not found', async () => {
       const taskId = '67f5153450a07804c587f768'
       vi.mocked(Task.findByIdAndDelete).mockResolvedValueOnce(null)

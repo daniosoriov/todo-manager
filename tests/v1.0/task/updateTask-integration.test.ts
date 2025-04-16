@@ -32,7 +32,7 @@ async function successfulUpdate(payload: Partial<typeof Task.schema.obj>) {
   expect(taskFindByIdAndUpdateSpy).toHaveBeenCalledWith(taskId, payload, { new: true })
 }
 
-describe('Update Task', () => {
+describe('Update Task Integration', () => {
   beforeAll(async () => {
     await connectInMemoryDB()
   })
@@ -49,14 +49,12 @@ describe('Update Task', () => {
   })
 
   describe('Successful Cases', () => {
-
     it('should update a task description only', async () => {
       const payload = {
         title: 'Updated task',
         description: 'Updated task description',
         status: 'completed' as const,
       }
-
       await successfulUpdate(payload)
     })
 
@@ -64,9 +62,7 @@ describe('Update Task', () => {
       const payload = {
         title: 'Updated task',
       }
-
       await successfulUpdate(payload)
-
       const updatedTask = await Task.findById(taskId)
       expect(updatedTask).toBeDefined()
       expect(updatedTask?.title).toBe(payload.title)
@@ -79,9 +75,7 @@ describe('Update Task', () => {
       const payload = {
         status: 'completed' as const,
       }
-
       await successfulUpdate(payload)
-
       const updatedTask = await Task.findById(taskId)
       expect(updatedTask).toBeDefined()
       expect(updatedTask?.status).toBe(payload.status)
@@ -94,9 +88,7 @@ describe('Update Task', () => {
       const payload = {
         dueDate: '2027-03-23T00:00:00.000Z',
       }
-
       await successfulUpdate(payload)
-
       const updatedTask = await Task.findById(taskId)
       expect(updatedTask).toBeDefined()
       expect(updatedTask?.dueDate.toISOString()).toEqual(payload.dueDate)
@@ -152,7 +144,6 @@ describe('Update Task', () => {
     describe('dueDate', () => {
       it('should fail when dueDate is not a valid date', async () => {
         const response = await supertest(app).put(path.replace(':taskId', taskId)).send({ dueDate: 'not valid date' })
-
         expect(response.status).toBe(400)
         expectExpressValidatorError(response, 'dueDate')
         expect(taskFindByIdAndUpdateSpy).not.toHaveBeenCalled()
@@ -160,7 +151,6 @@ describe('Update Task', () => {
 
       it('should fail when dueDate is in the past', async () => {
         const response = await supertest(app).put(path.replace(':taskId', taskId)).send({ dueDate: '1990-03-23T00:00:00.000Z' })
-
         expect(response.status).toBe(400)
         expectExpressValidatorError(response, 'dueDate')
         expect(taskFindByIdAndUpdateSpy).not.toHaveBeenCalled()

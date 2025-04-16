@@ -1,5 +1,5 @@
 import express from 'express'
-import { describe, it, expect, vi, beforeAll, afterAll } from 'vitest'
+import { describe, it, expect, vi, beforeAll, afterAll, beforeEach } from 'vitest'
 import supertest from 'supertest'
 import { connectInMemoryDB, disconnectInMemoryDB } from '@tests/utils/mongoMemoryServer'
 import expectExpressValidatorError from '../../utils/expectExpressValidatorError'
@@ -14,9 +14,15 @@ app.use(express.json())
 const path = '/v1.0/task'
 app.post(path, createTaskValidators, fieldValidation, createTask)
 
+const taskCreateSpy = vi.spyOn(Task, 'create')
+
 describe('Successful Cases', () => {
   beforeAll(async () => {
     await connectInMemoryDB()
+  })
+
+  beforeEach(() => {
+    vi.clearAllMocks()
   })
 
   afterAll(async () => {
@@ -31,7 +37,6 @@ describe('Successful Cases', () => {
       dueDate: '2026-03-23T00:00:00.000Z',
     }
 
-    const taskCreateSpy = vi.spyOn(Task, 'create')
     const response = await supertest(app).post(path).send(payload)
     expect(response.status).toBe(201)
     const newTask = response.body
@@ -50,7 +55,6 @@ describe('Successful Cases', () => {
       dueDate: '2026-03-23T00:00:00.000Z',
     }
 
-    const taskCreateSpy = vi.spyOn(Task, 'create')
     const response = await supertest(app).post(path).send(payload)
     expect(response.status).toBe(201)
     const newTask = response.body
@@ -66,7 +70,6 @@ describe('Successful Cases', () => {
       dueDate: '2026-03-23T00:00:00.000Z',
     }
 
-    const taskCreateSpy = vi.spyOn(Task, 'create')
     const response = await supertest(app).post(path).send(payload)
     expect(response.status).toBe(201)
     const newTask = response.body
@@ -96,7 +99,6 @@ describe('Failure Cases', () => {
   describe('Missing Fields', () => {
     it('should fail when no payload is provided', async () => {
       const response = await supertest(app).post(path).send({})
-
       expect(response.status).toBe(400)
       expectExpressValidatorError(response, 'title')
       expectExpressValidatorError(response, 'dueDate')
@@ -104,14 +106,12 @@ describe('Failure Cases', () => {
 
     it('should fail when no title is provided', async () => {
       const response = await supertest(app).post(path).send({ description: 'Test task' })
-
       expect(response.status).toBe(400)
       expectExpressValidatorError(response, 'title')
     })
 
     it('should fail when no dueDate is provided', async () => {
       const response = await supertest(app).post(path).send({ title: 'Test task' })
-
       expect(response.status).toBe(400)
       expectExpressValidatorError(response, 'dueDate')
     })
@@ -120,14 +120,12 @@ describe('Failure Cases', () => {
   describe('Empty Fields', () => {
     it('should fail when title is empty', async () => {
       const response = await supertest(app).post(path).send({ title: '', description: 'Test task' })
-
       expect(response.status).toBe(400)
       expectExpressValidatorError(response, 'title')
     })
 
     it('should fail when dueDate is empty', async () => {
       const response = await supertest(app).post(path).send({ title: 'Test task', dueDate: '' })
-
       expect(response.status).toBe(400)
       expectExpressValidatorError(response, 'dueDate')
     })
@@ -149,14 +147,12 @@ describe('Failure Cases', () => {
   describe('dueDate', () => {
     it('should fail when dueDate is not a valid date', async () => {
       const response = await supertest(app).post(path).send({ title: 'Test task', dueDate: 'not valid date' })
-
       expect(response.status).toBe(400)
       expectExpressValidatorError(response, 'dueDate')
     })
 
     it('should fail when dueDate is in the past', async () => {
       const response = await supertest(app).post(path).send({ title: 'Test task', dueDate: '1990-03-23T00:00:00.000Z' })
-
       expect(response.status).toBe(400)
       expectExpressValidatorError(response, 'dueDate')
     })
