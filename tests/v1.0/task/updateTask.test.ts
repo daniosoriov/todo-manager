@@ -70,7 +70,7 @@ describe('Failure Cases', () => {
 
     const response = await supertest(app).put(path.replace(':taskId', taskId)).send(payload)
     expect(response.status).toBe(500)
-    expect(response.body).toEqual({ error: 'Internal server error' })
+    expect(response.body).toEqual({ error: 'Internal Server Error' })
     expect(Task.findByIdAndUpdate).toHaveBeenCalledWith(taskId, payload, { new: true })
   })
 })

@@ -96,7 +96,7 @@ describe('Validation Errors', () => {
       const response = await supertest(app).post(path).send({})
 
       expect(response.status).toBe(500)
-      expect(response.body).toHaveProperty('error', 'Internal server error')
+      expect(response.body).toHaveProperty('error', 'Internal Server Error')
     })
 
     it('should fail when payload contains invalid fields', async () => {
@@ -105,7 +105,7 @@ describe('Validation Errors', () => {
       const response = await supertest(app).post(path).send({ title: 'Test task', invalidField: 'invalid' })
 
       expect(response.status).toBe(500)
-      expect(response.body).toHaveProperty('error', 'Internal server error')
+      expect(response.body).toHaveProperty('error', 'Internal Server Error')
     })
   })
 
@@ -117,7 +117,7 @@ describe('Validation Errors', () => {
       const response = await supertest(app).post(path).send({ description: 'Test task' })
 
       expect(response.status).toBe(500)
-      expect(response.body).toHaveProperty('error', 'Internal server error')
+      expect(response.body).toHaveProperty('error', 'Internal Server Error')
     })
 
     it('should fail when title is not a string', async () => {
@@ -126,7 +126,7 @@ describe('Validation Errors', () => {
       const response = await supertest(app).post(path).send({ title: 123, description: 'Test task' })
 
       expect(response.status).toBe(500)
-      expect(response.body).toHaveProperty('error', 'Internal server error')
+      expect(response.body).toHaveProperty('error', 'Internal Server Error')
     })
   })
 
@@ -137,7 +137,7 @@ describe('Validation Errors', () => {
       const response = await supertest(app).post(path).send({ title: 'Test task' })
 
       expect(response.status).toBe(500)
-      expect(response.body).toHaveProperty('error', 'Internal server error')
+      expect(response.body).toHaveProperty('error', 'Internal Server Error')
     })
 
     it('should fail when dueDate is not a date', async () => {
@@ -146,7 +146,7 @@ describe('Validation Errors', () => {
       const response = await supertest(app).post(path).send({ title: 'Test task', dueDate: 'invalid-date' })
 
       expect(response.status).toBe(500)
-      expect(response.body).toHaveProperty('error', 'Internal server error')
+      expect(response.body).toHaveProperty('error', 'Internal Server Error')
     })
 
     it('should fail when dueDate is in the past', async () => {
@@ -155,7 +155,7 @@ describe('Validation Errors', () => {
       const response = await supertest(app).post(path).send({ title: 'Test task', dueDate: '1990-01-01T00:00:00.000Z' })
 
       expect(response.status).toBe(500)
-      expect(response.body).toHaveProperty('error', 'Internal server error')
+      expect(response.body).toHaveProperty('error', 'Internal Server Error')
     })
   })
 })
