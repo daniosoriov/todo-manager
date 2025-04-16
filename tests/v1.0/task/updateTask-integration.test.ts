@@ -32,7 +32,7 @@ async function successfulUpdate(payload: Partial<typeof Task.schema.obj>) {
   expect(taskFindByIdAndUpdateSpy).toHaveBeenCalledWith(taskId, payload, { new: true })
 }
 
-describe('All cases', () => {
+describe('Update Task', () => {
   beforeAll(async () => {
     await connectInMemoryDB()
   })
@@ -106,7 +106,7 @@ describe('All cases', () => {
     })
   })
 
-  describe('Validation Errors', () => {
+  describe('Failure Cases', () => {
     describe('payload', () => {
       it('should return 400 error for empty payload', async () => {
         const response = await supertest(app).put(path.replace(':taskId', taskId)).send({})

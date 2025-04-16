@@ -92,7 +92,7 @@ describe('Successful Cases', () => {
   })
 })
 
-describe('Validation Errors', () => {
+describe('Failure Cases', () => {
   describe('Missing Fields', () => {
     it('should fail when no payload is provided', async () => {
       const response = await supertest(app).post(path).send({})
