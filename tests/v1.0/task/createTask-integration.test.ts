@@ -98,7 +98,6 @@ describe('Validation Errors', () => {
       const response = await supertest(app).post(path).send({})
 
       expect(response.status).toBe(400)
-      expect(response.body).toHaveProperty('errors')
       expectExpressValidatorError(response, 'title')
       expectExpressValidatorError(response, 'dueDate')
     })
@@ -107,7 +106,6 @@ describe('Validation Errors', () => {
       const response = await supertest(app).post(path).send({ description: 'Test task' })
 
       expect(response.status).toBe(400)
-      expect(response.body).toHaveProperty('errors')
       expectExpressValidatorError(response, 'title')
     })
 
@@ -115,7 +113,6 @@ describe('Validation Errors', () => {
       const response = await supertest(app).post(path).send({ title: 'Test task' })
 
       expect(response.status).toBe(400)
-      expect(response.body).toHaveProperty('errors')
       expectExpressValidatorError(response, 'dueDate')
     })
   })
@@ -125,7 +122,6 @@ describe('Validation Errors', () => {
       const response = await supertest(app).post(path).send({ title: '', description: 'Test task' })
 
       expect(response.status).toBe(400)
-      expect(response.body).toHaveProperty('errors')
       expectExpressValidatorError(response, 'title')
     })
 
@@ -133,7 +129,6 @@ describe('Validation Errors', () => {
       const response = await supertest(app).post(path).send({ title: 'Test task', dueDate: '' })
 
       expect(response.status).toBe(400)
-      expect(response.body).toHaveProperty('errors')
       expectExpressValidatorError(response, 'dueDate')
     })
   })
@@ -147,7 +142,6 @@ describe('Validation Errors', () => {
       })
 
       expect(response.status).toBe(400)
-      expect(response.body).toHaveProperty('errors')
       expectExpressValidatorError(response, 'status')
     })
   })
@@ -157,7 +151,6 @@ describe('Validation Errors', () => {
       const response = await supertest(app).post(path).send({ title: 'Test task', dueDate: 'not valid date' })
 
       expect(response.status).toBe(400)
-      expect(response.body).toHaveProperty('errors')
       expectExpressValidatorError(response, 'dueDate')
     })
 
@@ -165,7 +158,6 @@ describe('Validation Errors', () => {
       const response = await supertest(app).post(path).send({ title: 'Test task', dueDate: '1990-03-23T00:00:00.000Z' })
 
       expect(response.status).toBe(400)
-      expect(response.body).toHaveProperty('errors')
       expectExpressValidatorError(response, 'dueDate')
     })
   })
