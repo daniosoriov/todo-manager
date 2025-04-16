@@ -63,7 +63,6 @@ describe('Failure Cases', () => {
   it('should return a 400 error for invalid taskId format', async () => {
     const response = await supertest(app).get(path.replace(':taskId', 'invalidTaskId'))
     expect(response.status).toBe(400)
-    console.log(response.body)
     expectExpressValidatorError(response, 'taskId', 'params')
   })
 
