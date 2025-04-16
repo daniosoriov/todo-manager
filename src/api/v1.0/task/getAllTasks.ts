@@ -1,11 +1,12 @@
-import { Request, Response } from 'express'
+import { NextFunction, Request, Response } from 'express'
 import Task from '@src/models/Task'
 
-const getAllTasks = async (req: Request, res: Response) => {
+const getAllTasks = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const tasks = await Task.find({})
     if (!tasks) {
       res.status(404).json({ error: 'No tasks found' })
+      return next(new Error())
     }
     res.status(200).json(tasks)
   } catch (error) {
