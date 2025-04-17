@@ -4,6 +4,21 @@ A simple and efficient TODO Task Manager RESTful API to help you organize and ma
 
 This project is built with Node.js, Express, and MongoDB, providing a clean and easy-to-use tech stack.
 
+This repository supports a set of tutorials:
+
+| Article                                                                                         | Tag                                                                                       |
+|-------------------------------------------------------------------------------------------------|-------------------------------------------------------------------------------------------|
+| [Setting up the API](https://danioshi.substack.com/p/build-your-first-restful-api-with?r=i9w8u) | [v1-api-initial](https://github.com/daniosoriov/todo-manager/releases/tag/v1-api-initial) |
+| [Adding Tests with Vitest](https://danioshi.substack.com/p/how-to-test-your-nodejs-restful-api) | [v2-tests](https://github.com/daniosoriov/todo-manager/releases/tag/v2-tests)             |
+| Authentication - (Coming soon...)                                                               | v3-auth                                                                                   |
+| Advanced Features - (Coming soon...)                                                            | v4-features                                                                               |
+
+## Getting Started
+
+To check out a specific article's code:
+
+description here.
+
 ## Features
 
 - Create, retrieve, update, and delete tasks.
@@ -32,7 +47,7 @@ Start the server:
 npm start
 ```
 
-Now the server is running on `http://localhost:80`.
+Now the server is running on `http://localhost:3000`.
 
 ## Scripts
 
