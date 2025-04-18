@@ -1,6 +1,27 @@
 import { body, param } from 'express-validator'
 import { taskStatus } from '@src/types/types'
 
+const bodyEmail = () =>
+    body('email')
+        .notEmpty()
+        .withMessage(`'email' is required.`)
+        .trim()
+        .isEmail()
+        .withMessage(`'email' must be a valid email address.`)
+        .normalizeEmail()
+        .escape()
+
+const bodyPassword = () =>
+    body('password')
+        .notEmpty()
+        .withMessage(`'password' is required.`)
+        .trim()
+        .isString()
+        .withMessage(`'password' must be a string.`)
+        .isLength({ min: 8 })
+        .withMessage(`'password' must be at least 8 characters long.`)
+        .escape()
+
 const bodyStringOptional = (field: string) =>
     body(field)
         .optional()
@@ -73,6 +94,8 @@ const paramTaskId = () =>
 
 export
 {
+  bodyEmail,
+  bodyPassword,
   bodyStringOptional,
   bodyStringRequired,
   bodyStatusOptional,
