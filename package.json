@@ -29,10 +29,12 @@
     "node": ">=22.0.0"
   },
   "dependencies": {
+    "bcrypt": "^5.1.1",
     "dotenv": "^16.5.0",
     "express": "^5.1.0",
     "express-validator": "^7.2.1",
     "helmet": "^8.1.0",
+    "jsonwebtoken": "^9.0.2",
     "mongodb": "^6.15.0",
     "mongodb-memory-server": "^10.1.4",
     "mongoose": "^8.13.2"
