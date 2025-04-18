@@ -24,7 +24,6 @@ console.error = vi.fn()
 describe('Register User Integration Tests', () => {
   beforeAll(async () => {
     await connectInMemoryDB()
-    // await User.create(mockUser)
   })
 
   beforeEach(() => {
@@ -45,6 +44,17 @@ describe('Register User Integration Tests', () => {
   })
 
   describe('Failure Cases', () => {
+    it('should fail when email is already registered', async () => {
+      const newMockUser = {
+        email: 'testtest@test.com',
+        password: 'password123',
+      }
+      await User.create(newMockUser)
+      const response = await supertest(app).post(path).send(newMockUser)
+      expect(response.status).toBe(400)
+      expect(response.body).toHaveProperty('error', 'Email already registered')
+    })
+
     describe('Missing fields', () => {
       it('should fail when no payload is provided', async () => {
         const response = await supertest(app).post(path).send({})
