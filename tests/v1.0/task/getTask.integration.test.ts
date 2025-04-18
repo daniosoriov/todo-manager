@@ -6,7 +6,7 @@ import expectExpressValidatorError from '../../utils/expectExpressValidatorError
 
 import getTask from '@src/api/v1.0/task/getTask'
 import fieldValidation from '@src/middleware/fieldValidation'
-import getTaskValidators from '@src/validators/getTaskValidators'
+import getTaskValidators from '../../../src/validators/task/getTaskValidators'
 import Task from '@src/models/Task'
 
 const app = express()

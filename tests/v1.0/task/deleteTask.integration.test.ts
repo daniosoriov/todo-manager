@@ -6,7 +6,7 @@ import expectExpressValidatorError from '../../utils/expectExpressValidatorError
 
 import deleteTask from '@src/api/v1.0/task/deleteTask'
 import fieldValidation from '@src/middleware/fieldValidation'
-import deleteTaskValidators from '@src/validators/deleteTaskValidators'
+import deleteTaskValidators from '../../../src/validators/task/deleteTaskValidators'
 import Task from '@src/models/Task'
 
 const app = express()

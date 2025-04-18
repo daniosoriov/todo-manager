@@ -7,7 +7,7 @@ import expectExpressValidatorError from '../../utils/expectExpressValidatorError
 import updateTask from '@src/api/v1.0/task/updateTask'
 import validFieldsOnly from '../../../src/middleware/validFieldsOnly'
 import fieldValidation from '@src/middleware/fieldValidation'
-import updateTaskValidators from '@src/validators/updateTaskValidators'
+import updateTaskValidators from '../../../src/validators/task/updateTaskValidators'
 import Task from '@src/models/Task'
 
 const app = express()
