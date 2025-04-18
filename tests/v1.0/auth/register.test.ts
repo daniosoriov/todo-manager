@@ -25,6 +25,13 @@ describe('Register User Unit Tests', () => {
     expect(User.create).toHaveBeenCalledWith(reqAuth.body)
   })
 
+  it('should not register a user that already exists', async () => {
+    vi.mocked(User.create).mockRejectedValueOnce({ code: 11000 })
+    await register(reqAuth as Request, res as Response)
+    expect(res.status).toHaveBeenCalledWith(400)
+    expect(res.json).toHaveBeenCalledWith({ error: 'Email already registered' })
+  })
+
   it('should not register a user when there is a database error', async () => {
     vi.mocked(User.create).mockRejectedValueOnce(new Error('Database error'))
     await register(reqAuth as Request, res as Response)
