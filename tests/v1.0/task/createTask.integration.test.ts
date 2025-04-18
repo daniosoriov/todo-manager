@@ -2,7 +2,7 @@ import express from 'express'
 import { describe, it, expect, vi, beforeAll, afterAll, beforeEach } from 'vitest'
 import supertest from 'supertest'
 import { connectInMemoryDB, disconnectInMemoryDB } from '@tests/utils/mongoMemoryServer'
-import expectExpressValidatorError from '../../utils/expectExpressValidatorError'
+import expectExpressValidatorError from '@tests/utils/expectExpressValidatorError'
 
 import createTask from '@src/api/v1.0/task/createTask'
 import validFieldsOnly from '@src/middleware/validFieldsOnly'
