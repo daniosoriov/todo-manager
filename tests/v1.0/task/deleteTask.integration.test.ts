@@ -15,6 +15,7 @@ const path = '/v1.0/task/:taskId'
 app.delete(path, deleteTaskValidators, fieldValidation, deleteTask)
 
 const taskFindByIdAndDeleteSpy = vi.spyOn(Task, 'findByIdAndDelete')
+console.error = vi.fn()
 
 describe('Delete Task Integration Tests', () => {
   beforeAll(async () => {

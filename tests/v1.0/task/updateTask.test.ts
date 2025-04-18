@@ -24,6 +24,8 @@ const req = {
   },
 } as Partial<Request>
 
+console.error = vi.fn()
+
 describe('Update Task Unit Tests', () => {
   beforeEach(() => {
     vi.clearAllMocks()

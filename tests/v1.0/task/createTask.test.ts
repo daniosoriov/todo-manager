@@ -10,6 +10,8 @@ vi.mock('@src/models/Task', () => ({
   },
 }))
 
+console.error = vi.fn()
+
 const req = {
   body: {
     title: 'Test task',

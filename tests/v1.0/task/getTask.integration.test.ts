@@ -15,6 +15,7 @@ const path = '/v1.0/task/:taskId'
 app.get(path, getTaskValidators, fieldValidation, getTask)
 
 const taskFindByIdSpy = vi.spyOn(Task, 'findById')
+console.error = vi.fn()
 
 describe('Get Task Integration Tests', () => {
   beforeAll(async () => {
