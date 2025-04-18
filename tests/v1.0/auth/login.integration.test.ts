@@ -74,7 +74,7 @@ describe('Login User Integration Tests', () => {
         expectExpressValidatorError(response, 'email')
         expect(userFindOneSpy).not.toHaveBeenCalled()
       })
-      it('should fail when password is invalid', async () => {
+      it('should fail when password is too short', async () => {
         const response = await supertest(app).post(path).send({ email: mockUser.email, password: 'short' })
         expect(response.status).toBe(400)
         expectExpressValidatorError(response, 'password')
