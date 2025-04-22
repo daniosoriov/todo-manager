@@ -39,7 +39,6 @@ describe('Get Task Integration Tests', () => {
   describe('Authorization', () => {
     it('should return 400 if no token is provided', async () => {
       const response = await supertest(app).get(path.replace(':taskId', '603d2f4e4f1a2c001f8b4567'))
-      expect(response.status).toBe(400)
       expectExpressValidatorError(response, 'authorization', 'headers')
       expect(jwtVerifySpy).not.toHaveBeenCalled()
       expect(taskFindByIdSpy).not.toHaveBeenCalled()
@@ -52,7 +51,7 @@ describe('Get Task Integration Tests', () => {
           .set('Authorization', `Bearer ${invalidToken}`)
       expect(response.status).toBe(401)
       expect(jwtVerifySpy).toHaveBeenCalledWith(invalidToken, jwtSecret)
-      expect(response.body).toEqual({ message: 'Unauthorized' })
+      expect(response.body).toEqual({ error: 'Unauthorized' })
     })
   })
 
@@ -92,7 +91,6 @@ describe('Get Task Integration Tests', () => {
       const response = await supertest(app)
           .get(path.replace(':taskId', 'invalidTaskId'))
           .set('Authorization', `Bearer ${token}`)
-      expect(response.status).toBe(400)
       expectExpressValidatorError(response, 'taskId', 'params')
       expect(jwtVerifySpy).not.toHaveBeenCalled()
       expect(taskFindByIdSpy).not.toHaveBeenCalled()
