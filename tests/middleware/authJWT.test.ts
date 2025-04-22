@@ -22,7 +22,7 @@ const runUnauthorizedTest = (authHeader: string | null, error: Error) => {
   authJWT(req as Request, res as Response, next as NextFunction)
 
   expect(res.status).toHaveBeenCalledWith(401)
-  expect(res.json).toHaveBeenCalledWith({ message: 'Unauthorized' })
+  expect(res.json).toHaveBeenCalledWith({ error: 'Unauthorized' })
   expect(next).toHaveBeenCalledWith(new Error('Unauthorized'))
 }
 
