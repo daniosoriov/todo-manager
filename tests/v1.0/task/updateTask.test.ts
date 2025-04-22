@@ -6,7 +6,7 @@ import Task from '@src/models/Task'
 
 vi.mock('@src/models/Task', () => ({
   default: {
-    findByIdAndUpdate: vi.fn(),
+    findOneAndUpdate: vi.fn(),
   },
 }))
 
@@ -18,6 +18,9 @@ const body = {
 }
 
 const req = {
+  user: {
+    _id: 'userId',
+  },
   body,
   params: {
     taskId: taskId,
@@ -32,15 +35,15 @@ describe('Update Task Unit Tests', () => {
   })
 
   it('should update a task successfully', async () => {
-    vi.mocked(Task.findByIdAndUpdate).mockResolvedValueOnce({ ...body, _id: taskId } as any)
+    vi.mocked(Task.findOneAndUpdate).mockResolvedValueOnce({ ...body, _id: taskId } as any)
     await updateTask(req as Request, res as Response, next)
     expect(res.status).toHaveBeenCalledWith(200)
     expect(res.json).toHaveBeenCalledWith({ message: 'Task updated successfully' })
-    expect(Task.findByIdAndUpdate).toHaveBeenCalledWith(taskId, body, { new: true })
+    expect(Task.findOneAndUpdate).toHaveBeenCalledWith({ _id: taskId, userId: req.user!._id }, body, { new: true })
   })
 
   it('should fail to update a task when it does not exist', async () => {
-    vi.mocked(Task.findByIdAndUpdate).mockResolvedValueOnce(null)
+    vi.mocked(Task.findOneAndUpdate).mockResolvedValueOnce(null)
     await updateTask(req as Request, res as Response, next)
     expect(res.status).toHaveBeenCalledWith(404)
     expect(res.json).toHaveBeenCalledWith({ error: 'Task not found' })
@@ -54,7 +57,7 @@ describe('Update Task Unit Tests', () => {
   })
 
   it('should fail to update a task when there is a database error', async () => {
-    vi.mocked(Task.findByIdAndUpdate).mockRejectedValueOnce(new Error('Database error'))
+    vi.mocked(Task.findOneAndUpdate).mockRejectedValueOnce(new Error('Database error'))
     await updateTask(req as Request, res as Response, next)
     expect(res.status).toHaveBeenCalledWith(500)
     expect(res.json).toHaveBeenCalledWith({ error: 'Internal Server Error' })

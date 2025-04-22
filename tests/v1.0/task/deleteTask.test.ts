@@ -6,7 +6,7 @@ import Task from '@src/models/Task'
 
 vi.mock('@src/models/Task', () => ({
   default: {
-    findByIdAndDelete: vi.fn(),
+    findOneAndDelete: vi.fn(),
   },
 }))
 
@@ -18,22 +18,22 @@ describe('Delete Task Unit Tests', () => {
   })
 
   it('should delete a task successfully', async () => {
-    vi.mocked(Task.findByIdAndDelete).mockResolvedValueOnce({ _id: taskId } as any)
+    vi.mocked(Task.findOneAndDelete).mockResolvedValueOnce({ _id: taskId } as any)
     await deleteTask(reqTask as Request, res as Response, next)
     expect(res.status).toHaveBeenCalledWith(200)
     expect(res.json).toHaveBeenCalledWith({ message: 'Task deleted successfully' })
-    expect(Task.findByIdAndDelete).toHaveBeenCalledWith(taskId)
+    expect(Task.findOneAndDelete).toHaveBeenCalledWith({ _id: taskId, userId: reqTask.user!._id })
   })
 
   it('should fail to delete a task when it does not exist', async () => {
-    vi.mocked(Task.findByIdAndDelete).mockResolvedValueOnce(null)
+    vi.mocked(Task.findOneAndDelete).mockResolvedValueOnce(null)
     await deleteTask(reqTask as Request, res as Response, next)
     expect(res.status).toHaveBeenCalledWith(404)
     expect(res.json).toHaveBeenCalledWith({ error: 'Task not found' })
   })
 
   it('should fail to delete a task when there is a database error', async () => {
-    vi.mocked(Task.findByIdAndDelete).mockRejectedValueOnce(new Error('Database error'))
+    vi.mocked(Task.findOneAndDelete).mockRejectedValueOnce(new Error('Database error'))
     await deleteTask(reqTask as Request, res as Response, next)
     expect(res.status).toHaveBeenCalledWith(500)
     expect(res.json).toHaveBeenCalledWith({ error: 'Internal Server Error' })

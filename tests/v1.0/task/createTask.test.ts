@@ -13,6 +13,9 @@ vi.mock('@src/models/Task', () => ({
 console.error = vi.fn()
 
 const req = {
+  user: {
+    _id: 'userId',
+  },
   body: {
     title: 'Test task',
     description: 'Test task description',
@@ -31,7 +34,7 @@ describe('Create Task Unit Tests', () => {
     await createTask(req as Request, res as Response)
     expect(res.status).toHaveBeenCalledWith(201)
     expect(res.json).toHaveBeenCalledWith(req.body)
-    expect(Task.create).toHaveBeenCalledWith(req.body)
+    expect(Task.create).toHaveBeenCalledWith({ ...req.body, userId: req.user!._id })
   })
 
   it('should not create a task when there is a database error', async () => {
