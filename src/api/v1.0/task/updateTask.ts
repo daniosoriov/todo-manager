@@ -1,7 +1,8 @@
-import { NextFunction, Request, Response } from 'express'
+import { NextFunction, Response } from 'express'
 import Task from '@src/models/Task'
+import { JWTRequest } from '@src/types/express'
 
-const updateTask = async (req: Request, res: Response, next: NextFunction) => {
+const updateTask = async (req: JWTRequest, res: Response, next: NextFunction) => {
   const taskId = req.params.taskId
   const taskUpdates = req.body
   if (!taskUpdates || Object.keys(taskUpdates).length === 0) {
@@ -10,7 +11,11 @@ const updateTask = async (req: Request, res: Response, next: NextFunction) => {
   }
 
   try {
-    const task = await Task.findByIdAndUpdate(taskId, taskUpdates, { new: true })
+    const task = await Task.findOneAndUpdate(
+        { _id: taskId, userId: req.user!._id },
+        taskUpdates,
+        { new: true },
+    )
     if (!task) {
       res.status(404).json({ error: 'Task not found' })
       return next(new Error())
