@@ -1,9 +1,10 @@
-import { NextFunction, Request, Response } from 'express'
+import { NextFunction, Response } from 'express'
 import jwt from 'jsonwebtoken'
 import getEnvVariable from '@src/utils/getEnvVariable'
 import { DecodedToken } from '@src/types/interfaces'
+import { JWTRequest } from '@src/types/express'
 
-const authJWT = (req: Request, res: Response, next: NextFunction) => {
+const authJWT = (req: JWTRequest, res: Response, next: NextFunction) => {
   const token = req.header('Authorization')?.replace('Bearer ', '')
   if (!token) {
     res.status(401).json({ error: 'Unauthorized' })
