@@ -6,7 +6,7 @@ import { DecodedToken } from '@src/types/interfaces'
 const authJWT = (req: Request, res: Response, next: NextFunction) => {
   const token = req.header('Authorization')?.replace('Bearer ', '')
   if (!token) {
-    res.status(401).json({ message: 'Unauthorized' })
+    res.status(401).json({ error: 'Unauthorized' })
     return next(new Error('Unauthorized'))
   }
 
@@ -16,7 +16,7 @@ const authJWT = (req: Request, res: Response, next: NextFunction) => {
     next()
   } catch (error) {
     console.error('Invalid token:', error)
-    res.status(401).json({ message: 'Unauthorized' })
+    res.status(401).json({ error: 'Unauthorized' })
     next(new Error('Unauthorized'))
   }
 }
