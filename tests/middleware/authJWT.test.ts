@@ -4,11 +4,8 @@ import jwt from 'jsonwebtoken'
 import { res, next } from '@tests/utils/unitTestSetup'
 import authJWT from '@src/middleware/authJWT'
 
-vi.mock('@src/utils/getEnvVariable', () => {
-  return {
-    default: vi.fn().mockReturnValue('testSecret'),
-  }
-})
+const jwtSecret = 'testSecret'
+vi.stubEnv('JWT_SECRET', jwtSecret)
 const jwtVerifySpy = vi.spyOn(jwt, 'verify')
 console.error = vi.fn()
 
@@ -31,13 +28,13 @@ const runUnauthorizedTest = (authHeader: string | null, error: Error) => {
 
 describe('Auth JWT', () => {
   it('should call next() if token is valid', () => {
-    const token = jwt.sign({ _id: 'testId' }, 'testSecret', { expiresIn: '24h' })
+    const token = jwt.sign({ _id: 'testId' }, jwtSecret, { expiresIn: '24h' })
     const req = createMockRequest(`Bearer ${token}`)
 
     authJWT(req as Request, res as Response, next as NextFunction)
 
     expect(req.header).toHaveBeenCalledWith('Authorization')
-    expect(jwtVerifySpy).toHaveBeenCalledWith(token, 'testSecret')
+    expect(jwtVerifySpy).toHaveBeenCalledWith(token, jwtSecret)
     // @ts-ignore
     expect(req?.user).toEqual({ _id: 'testId', iat: expect.any(Number), exp: expect.any(Number) })
     expect(next).toHaveBeenCalled()
