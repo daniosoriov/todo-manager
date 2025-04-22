@@ -14,6 +14,7 @@ interface CustomError {
  * @param location - The location of the field (default is 'body')
  */
 const expectExpressValidatorError = (response: any, field: string, location: Location = 'body') => {
+  expect(response.status).toBe(400)
   expect(response).toHaveProperty('body')
   expect(response.body).not.toBeNull()
   expect(response.body).toHaveProperty('errors')
