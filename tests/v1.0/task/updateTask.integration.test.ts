@@ -11,6 +11,7 @@ import updateTaskValidators from '@src/validators/task/updateTaskValidators'
 import authJWT from '@src/middleware/authJWT'
 import Task from '@src/models/Task'
 import jwt from 'jsonwebtoken'
+import createTestUserAndToken from '../../utils/createTestUserAndToken'
 
 const app = express()
 app.use(express.json())
@@ -23,14 +24,17 @@ const mockedTask = {
   status: 'pending',
   dueDate: '2036-03-23T00:00:00.000Z',
   creationDate: new Date('2025-04-08T12:23:16.476Z'),
+  userId: '',
 }
 let taskId: string
 const jwtSecret = 'testSecret'
 vi.stubEnv('JWT_SECRET', jwtSecret)
-const token = jwt.sign({ _id: 'testUserId' }, jwtSecret, { expiresIn: '1h' })
 const jwtVerifySpy = vi.spyOn(jwt, 'verify')
-const taskFindByIdAndUpdateSpy = vi.spyOn(Task, 'findByIdAndUpdate')
+const taskFindOneAndUpdateSpy = vi.spyOn(Task, 'findOneAndUpdate')
 console.error = vi.fn()
+
+let userId: string
+let token: string
 
 async function successfulUpdate(payload: Partial<typeof Task.schema.obj>) {
   const response = await supertest(app)
@@ -40,17 +44,21 @@ async function successfulUpdate(payload: Partial<typeof Task.schema.obj>) {
   expect(response.status).toBe(200)
   expect(response.body).toEqual({ message: 'Task updated successfully' })
   expect(jwtVerifySpy).toHaveBeenCalledWith(token, jwtSecret)
-  expect(taskFindByIdAndUpdateSpy).toHaveBeenCalledWith(taskId, payload, { new: true })
+  expect(taskFindOneAndUpdateSpy).toHaveBeenCalledWith({ _id: taskId, userId }, payload, { new: true })
 }
 
 describe('Update Task Integration Tests', () => {
   beforeAll(async () => {
     await connectInMemoryDB()
+    const result = await createTestUserAndToken('test@test.com', 'password', jwtSecret)
+    userId = result.userId
+    token = result.token
   })
 
   beforeEach(async () => {
     vi.clearAllMocks()
     // Insert a task into the in-memory database
+    mockedTask.userId = userId
     const createdTask = await Task.create(mockedTask)
     taskId = createdTask._id.toString()
   })
@@ -64,7 +72,7 @@ describe('Update Task Integration Tests', () => {
       const response = await supertest(app).put(path.replace(':taskId', taskId)).send({ title: 'New title' })
       expectExpressValidatorError(response, 'authorization', 'headers')
       expect(jwtVerifySpy).not.toHaveBeenCalled()
-      expect(taskFindByIdAndUpdateSpy).not.toHaveBeenCalled()
+      expect(taskFindOneAndUpdateSpy).not.toHaveBeenCalled()
     })
 
     it('should return 401 if an invalid token is provided', async () => {
@@ -138,7 +146,7 @@ describe('Update Task Integration Tests', () => {
             .send({})
         expect(response.status).toBe(400)
         expect(jwtVerifySpy).toHaveBeenCalledWith(token, jwtSecret)
-        expect(taskFindByIdAndUpdateSpy).not.toHaveBeenCalled()
+        expect(taskFindOneAndUpdateSpy).not.toHaveBeenCalled()
       })
 
       it('should return 400 error for invalid payload', async () => {
@@ -148,7 +156,7 @@ describe('Update Task Integration Tests', () => {
             .send({ invalidField: 'invalidValue' })
         expect(response.status).toBe(400)
         expect(jwtVerifySpy).not.toHaveBeenCalled()
-        expect(taskFindByIdAndUpdateSpy).not.toHaveBeenCalled()
+        expect(taskFindOneAndUpdateSpy).not.toHaveBeenCalled()
       })
     })
 
@@ -160,7 +168,7 @@ describe('Update Task Integration Tests', () => {
             .send({ title: 'New title' })
         expectExpressValidatorError(response, 'taskId', 'params')
         expect(jwtVerifySpy).not.toHaveBeenCalled()
-        expect(taskFindByIdAndUpdateSpy).not.toHaveBeenCalled()
+        expect(taskFindOneAndUpdateSpy).not.toHaveBeenCalled()
       })
 
       it('should return a 404 error for non-existing taskId', async () => {
@@ -186,7 +194,7 @@ describe('Update Task Integration Tests', () => {
             .send(payload)
         expectExpressValidatorError(response, 'status')
         expect(jwtVerifySpy).not.toHaveBeenCalled()
-        expect(taskFindByIdAndUpdateSpy).not.toHaveBeenCalled()
+        expect(taskFindOneAndUpdateSpy).not.toHaveBeenCalled()
       })
     })
 
@@ -198,7 +206,7 @@ describe('Update Task Integration Tests', () => {
             .send({ dueDate: 'not valid date' })
         expectExpressValidatorError(response, 'dueDate')
         expect(jwtVerifySpy).not.toHaveBeenCalled()
-        expect(taskFindByIdAndUpdateSpy).not.toHaveBeenCalled()
+        expect(taskFindOneAndUpdateSpy).not.toHaveBeenCalled()
       })
 
       it('should fail when dueDate is in the past', async () => {
@@ -208,7 +216,7 @@ describe('Update Task Integration Tests', () => {
             .send({ dueDate: '1990-03-23T00:00:00.000Z' })
         expectExpressValidatorError(response, 'dueDate')
         expect(jwtVerifySpy).not.toHaveBeenCalled()
-        expect(taskFindByIdAndUpdateSpy).not.toHaveBeenCalled()
+        expect(taskFindOneAndUpdateSpy).not.toHaveBeenCalled()
       })
     })
   })

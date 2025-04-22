@@ -4,6 +4,7 @@ import supertest from 'supertest'
 import jwt from 'jsonwebtoken'
 import { connectInMemoryDB, disconnectInMemoryDB } from '@tests/utils/mongoMemoryServer'
 import expectExpressValidatorError from '@tests/utils/expectExpressValidatorError'
+import createTestUserAndToken from '@tests/utils/createTestUserAndToken'
 
 import createTask from '@src/api/v1.0/task/createTask'
 import validFieldsOnly from '@src/middleware/validFieldsOnly'
@@ -19,10 +20,12 @@ app.post(path, validFieldsOnly, createTaskValidators, fieldValidation, authJWT, 
 
 const jwtSecret = 'testSecret'
 vi.stubEnv('JWT_SECRET', jwtSecret)
-const token = jwt.sign({ _id: 'testUserId' }, jwtSecret, { expiresIn: '1h' })
 const jwtVerifySpy = vi.spyOn(jwt, 'verify')
 const taskCreateSpy = vi.spyOn(Task, 'create')
 console.error = vi.fn()
+
+let token: string
+let userId: string
 
 describe('Create Task Integration Tests', () => {
   describe('Authorization', () => {
@@ -55,6 +58,9 @@ describe('Create Task Integration Tests', () => {
   describe('Successful Cases', () => {
     beforeAll(async () => {
       await connectInMemoryDB()
+      const result = await createTestUserAndToken('test@test.com', 'password', jwtSecret)
+      userId = result.userId
+      token = result.token
     })
 
     beforeEach(() => {
@@ -85,7 +91,7 @@ describe('Create Task Integration Tests', () => {
       expect(newTask).toHaveProperty('status', payload.status)
       expect(newTask).toHaveProperty('dueDate', payload.dueDate)
       expect(jwtVerifySpy).toHaveBeenCalledWith(token, jwtSecret)
-      expect(taskCreateSpy).toHaveBeenCalledWith(payload)
+      expect(taskCreateSpy).toHaveBeenCalledWith({ ...payload, userId })
     })
 
     it('should create a task even with no description', async () => {
@@ -104,7 +110,7 @@ describe('Create Task Integration Tests', () => {
       expect(newTask).toHaveProperty('_id')
       expect(newTask.description).toBeUndefined()
       expect(jwtVerifySpy).toHaveBeenCalledWith(token, jwtSecret)
-      expect(taskCreateSpy).toHaveBeenCalledWith(payload)
+      expect(taskCreateSpy).toHaveBeenCalledWith({ ...payload, userId })
     })
 
     it('should create a task even with no status', async () => {
@@ -123,7 +129,7 @@ describe('Create Task Integration Tests', () => {
       expect(newTask).toHaveProperty('_id')
       expect(newTask).toHaveProperty('status', 'pending')
       expect(jwtVerifySpy).toHaveBeenCalledWith(token, jwtSecret)
-      expect(taskCreateSpy).toHaveBeenCalledWith({ ...payload, status: 'pending' })
+      expect(taskCreateSpy).toHaveBeenCalledWith({ ...payload, status: 'pending', userId })
     })
 
     it('should create a task even with no description and status', async () => {
@@ -142,7 +148,7 @@ describe('Create Task Integration Tests', () => {
       expect(newTask.description).toBeUndefined()
       expect(newTask).toHaveProperty('status', 'pending')
       expect(jwtVerifySpy).toHaveBeenCalledWith(token, jwtSecret)
-      expect(taskCreateSpy).toHaveBeenCalledWith({ ...payload, status: 'pending' })
+      expect(taskCreateSpy).toHaveBeenCalledWith({ ...payload, status: 'pending', userId })
     })
   })
 

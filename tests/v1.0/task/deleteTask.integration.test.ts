@@ -3,6 +3,7 @@ import { describe, it, expect, vi, beforeAll, afterAll, beforeEach } from 'vites
 import supertest from 'supertest'
 import { connectInMemoryDB, disconnectInMemoryDB } from '@tests/utils/mongoMemoryServer'
 import expectExpressValidatorError from '@tests/utils/expectExpressValidatorError'
+import createTestUserAndToken from '@tests/utils/createTestUserAndToken'
 
 import deleteTask from '@src/api/v1.0/task/deleteTask'
 import fieldValidation from '@src/middleware/fieldValidation'
@@ -18,14 +19,19 @@ app.delete(path, deleteTaskValidators, fieldValidation, authJWT, deleteTask)
 
 const jwtSecret = 'testSecret'
 vi.stubEnv('JWT_SECRET', jwtSecret)
-const token = jwt.sign({ _id: 'testUserId' }, jwtSecret, { expiresIn: '1h' })
 const jwtVerifySpy = vi.spyOn(jwt, 'verify')
-const taskFindByIdAndDeleteSpy = vi.spyOn(Task, 'findByIdAndDelete')
+const taskFindOneAndDeleteSpy = vi.spyOn(Task, 'findOneAndDelete')
 console.error = vi.fn()
+
+let userId: string
+let token: string
 
 describe('Delete Task Integration Tests', () => {
   beforeAll(async () => {
     await connectInMemoryDB()
+    const result = await createTestUserAndToken('test@test.com', 'password', jwtSecret)
+    userId = result.userId
+    token = result.token
   })
 
   beforeEach(async () => {
@@ -41,7 +47,7 @@ describe('Delete Task Integration Tests', () => {
       const response = await supertest(app).delete(path.replace(':taskId', '67ff95ce036a26e20e4b3303'))
       expectExpressValidatorError(response, 'authorization', 'headers')
       expect(jwtVerifySpy).not.toHaveBeenCalled()
-      expect(taskFindByIdAndDeleteSpy).not.toHaveBeenCalled()
+      expect(taskFindOneAndDeleteSpy).not.toHaveBeenCalled()
     })
 
     it('should return 401 if an invalid token is provided', async () => {
@@ -62,7 +68,7 @@ describe('Delete Task Integration Tests', () => {
         description: 'Test task description',
         status: 'pending',
         dueDate: '2036-03-23T00:00:00.000Z',
-        creationDate: new Date('2025-04-08T12:23:16.476Z'),
+        userId,
       }
       const createdTask = await Task.create(mockedTask)
       const taskId = createdTask._id.toString()
@@ -73,7 +79,7 @@ describe('Delete Task Integration Tests', () => {
       expect(response.status).toBe(200)
       expect(response.body).toEqual({ message: 'Task deleted successfully' })
       expect(jwtVerifySpy).toHaveBeenCalledWith(token, jwtSecret)
-      expect(taskFindByIdAndDeleteSpy).toHaveBeenCalledWith(taskId)
+      expect(taskFindOneAndDeleteSpy).toHaveBeenCalledWith({ _id: taskId, userId })
     })
   })
 
@@ -86,7 +92,7 @@ describe('Delete Task Integration Tests', () => {
       expect(response.status).toBe(404)
       expect(response.body).toEqual({ error: 'Task not found' })
       expect(jwtVerifySpy).toHaveBeenCalledWith(token, jwtSecret)
-      expect(taskFindByIdAndDeleteSpy).toHaveBeenCalledWith(nonExistentTaskId)
+      expect(taskFindOneAndDeleteSpy).toHaveBeenCalledWith({ _id: nonExistentTaskId, userId })
     })
 
     it('should return a 400 error for invalid taskId format', async () => {
@@ -95,11 +101,11 @@ describe('Delete Task Integration Tests', () => {
           .set('Authorization', `Bearer ${token}`)
       expectExpressValidatorError(response, 'taskId', 'params')
       expect(jwtVerifySpy).not.toHaveBeenCalled()
-      expect(taskFindByIdAndDeleteSpy).not.toHaveBeenCalled()
+      expect(taskFindOneAndDeleteSpy).not.toHaveBeenCalled()
     })
 
     it('should return a 500 error if there is a database error', async () => {
-      taskFindByIdAndDeleteSpy.mockRejectedValueOnce(new Error('Server error'))
+      taskFindOneAndDeleteSpy.mockRejectedValueOnce(new Error('Server error'))
       const taskId = '67ff95ce036a26e20e4b3303'
       const response = await supertest(app)
           .delete(path.replace(':taskId', taskId))
@@ -107,7 +113,7 @@ describe('Delete Task Integration Tests', () => {
       expect(response.status).toBe(500)
       expect(response.body).toEqual({ error: 'Internal Server Error' })
       expect(jwtVerifySpy).toHaveBeenCalledWith(token, jwtSecret)
-      expect(taskFindByIdAndDeleteSpy).toHaveBeenCalledWith(taskId)
+      expect(taskFindOneAndDeleteSpy).toHaveBeenCalledWith({ _id: taskId, userId })
     })
   })
 })

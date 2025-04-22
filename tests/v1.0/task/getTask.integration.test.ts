@@ -4,6 +4,7 @@ import supertest from 'supertest'
 import jwt from 'jsonwebtoken'
 import { connectInMemoryDB, disconnectInMemoryDB } from '@tests/utils/mongoMemoryServer'
 import expectExpressValidatorError from '@tests/utils/expectExpressValidatorError'
+import createTestUserAndToken from '@tests/utils/createTestUserAndToken'
 
 import getTask from '@src/api/v1.0/task/getTask'
 import fieldValidation from '@src/middleware/fieldValidation'
@@ -18,14 +19,19 @@ app.get(path, getTaskValidators, fieldValidation, authJWT, getTask)
 
 const jwtSecret = 'testSecret'
 vi.stubEnv('JWT_SECRET', jwtSecret)
-const token = jwt.sign({ _id: 'testUserId' }, jwtSecret, { expiresIn: '1h' })
 const jwtVerifySpy = vi.spyOn(jwt, 'verify')
-const taskFindByIdSpy = vi.spyOn(Task, 'findById')
+const taskFindOneSpy = vi.spyOn(Task, 'findOne')
 console.error = vi.fn()
+
+let userId: string
+let token: string
 
 describe('Get Task Integration Tests', () => {
   beforeAll(async () => {
     await connectInMemoryDB()
+    const result = await createTestUserAndToken('test@test.com', 'password', jwtSecret)
+    userId = result.userId
+    token = result.token
   })
 
   beforeEach(() => {
@@ -41,7 +47,7 @@ describe('Get Task Integration Tests', () => {
       const response = await supertest(app).get(path.replace(':taskId', '603d2f4e4f1a2c001f8b4567'))
       expectExpressValidatorError(response, 'authorization', 'headers')
       expect(jwtVerifySpy).not.toHaveBeenCalled()
-      expect(taskFindByIdSpy).not.toHaveBeenCalled()
+      expect(taskFindOneSpy).not.toHaveBeenCalled()
     })
 
     it('should return 401 if an invalid token is provided', async () => {
@@ -63,7 +69,7 @@ describe('Get Task Integration Tests', () => {
         description: 'Test task description',
         status: 'pending',
         dueDate: '2036-03-23T00:00:00.000Z',
-        creationDate: new Date('2025-04-08T12:23:16.476Z'),
+        userId,
       })
 
       const taskId = mockedTask._id.toString()
@@ -73,16 +79,14 @@ describe('Get Task Integration Tests', () => {
 
       expect(jwtVerifySpy).toHaveBeenCalledWith(token, jwtSecret)
       expect(response.status).toBe(200)
-      expect(response.body).toEqual({
-        _id: taskId,
-        title: mockedTask.title,
-        description: mockedTask.description,
-        status: mockedTask.status,
-        dueDate: mockedTask.dueDate.toISOString(),
-        creationDate: mockedTask.creationDate.toISOString(),
-        __v: mockedTask.__v,
-      })
-      expect(taskFindByIdSpy).toHaveBeenCalledWith(taskId)
+      expect(response.body._id).toBe(taskId)
+      expect(response.body.userId).toBe(userId)
+      expect(response.body.title).toBe(mockedTask.title)
+      expect(response.body.description).toBe(mockedTask.description)
+      expect(response.body.status).toBe(mockedTask.status)
+      expect(response.body.dueDate).toBe(mockedTask.dueDate.toISOString())
+      expect(response.body.__v).toBe(mockedTask.__v)
+      expect(taskFindOneSpy).toHaveBeenCalledWith({ _id: taskId, userId })
     })
   })
 
@@ -93,7 +97,7 @@ describe('Get Task Integration Tests', () => {
           .set('Authorization', `Bearer ${token}`)
       expectExpressValidatorError(response, 'taskId', 'params')
       expect(jwtVerifySpy).not.toHaveBeenCalled()
-      expect(taskFindByIdSpy).not.toHaveBeenCalled()
+      expect(taskFindOneSpy).not.toHaveBeenCalled()
     })
 
     it('should return a 404 error for non-existing taskId', async () => {
@@ -104,7 +108,7 @@ describe('Get Task Integration Tests', () => {
       expect(jwtVerifySpy).toHaveBeenCalledWith(token, jwtSecret)
       expect(response.status).toBe(404)
       expect(response.body).toEqual({ error: 'Task not found' })
-      expect(taskFindByIdSpy).toHaveBeenCalledWith(nonExistingTaskId)
+      expect(taskFindOneSpy).toHaveBeenCalledWith({ _id: nonExistingTaskId, userId })
     })
 
     it('should fail when no taskId is provided', async () => {
@@ -114,12 +118,12 @@ describe('Get Task Integration Tests', () => {
       expect(response.status).toBe(404)
       expect(response.body).toEqual({})
       expect(jwtVerifySpy).not.toHaveBeenCalled()
-      expect(taskFindByIdSpy).not.toHaveBeenCalled()
+      expect(taskFindOneSpy).not.toHaveBeenCalled()
     })
 
     it('should return a 500 error for database error', async () => {
       const taskId = '603d2f4e4f1a2c001f8b4567'
-      taskFindByIdSpy.mockImplementationOnce(() => {
+      taskFindOneSpy.mockImplementationOnce(() => {
         throw new Error('Database error')
       })
       const response = await supertest(app)
@@ -128,7 +132,7 @@ describe('Get Task Integration Tests', () => {
       expect(jwtVerifySpy).toHaveBeenCalledWith(token, jwtSecret)
       expect(response.status).toBe(500)
       expect(response.body).toEqual({ error: 'Internal Server Error' })
-      expect(taskFindByIdSpy).toHaveBeenCalledWith(taskId)
+      expect(taskFindOneSpy).toHaveBeenCalledWith({ _id: taskId, userId })
     })
   })
 })
