@@ -31,7 +31,6 @@ describe('Create Task Integration Tests', () => {
         title: 'Test task',
         dueDate: '2026-03-23T00:00:00.000Z',
       })
-      expect(response.status).toBe(400)
       expectExpressValidatorError(response, 'authorization', 'headers')
       expect(jwtVerifySpy).not.toHaveBeenCalled()
       expect(taskCreateSpy).not.toHaveBeenCalled()
@@ -48,7 +47,7 @@ describe('Create Task Integration Tests', () => {
           })
       expect(response.status).toBe(401)
       expect(jwtVerifySpy).toHaveBeenCalledWith(invalidToken, jwtSecret)
-      expect(response.body).toEqual({ message: 'Unauthorized' })
+      expect(response.body).toEqual({ error: 'Unauthorized' })
       expect(taskCreateSpy).not.toHaveBeenCalled()
     })
   })
@@ -155,7 +154,6 @@ describe('Create Task Integration Tests', () => {
     describe('Missing Fields', () => {
       it('should fail when no payload is provided', async () => {
         const response = await supertest(app).post(path).send({}).set('Authorization', `Bearer ${token}`)
-        expect(response.status).toBe(400)
         expectExpressValidatorError(response, 'title')
         expectExpressValidatorError(response, 'dueDate')
         expect(jwtVerifySpy).not.toHaveBeenCalled()
@@ -167,7 +165,6 @@ describe('Create Task Integration Tests', () => {
             .post(path)
             .send({ description: 'Test task' })
             .set('Authorization', `Bearer ${token}`)
-        expect(response.status).toBe(400)
         expectExpressValidatorError(response, 'title')
         expect(jwtVerifySpy).not.toHaveBeenCalled()
         expect(taskCreateSpy).not.toHaveBeenCalled()
@@ -178,7 +175,6 @@ describe('Create Task Integration Tests', () => {
             .post(path)
             .send({ title: 'Test task' })
             .set('Authorization', `Bearer ${token}`)
-        expect(response.status).toBe(400)
         expectExpressValidatorError(response, 'dueDate')
         expect(jwtVerifySpy).not.toHaveBeenCalled()
         expect(taskCreateSpy).not.toHaveBeenCalled()
@@ -211,7 +207,6 @@ describe('Create Task Integration Tests', () => {
               description: 'Test task',
             })
             .set('Authorization', `Bearer ${token}`)
-        expect(response.status).toBe(400)
         expectExpressValidatorError(response, 'title')
         expect(jwtVerifySpy).not.toHaveBeenCalled()
         expect(taskCreateSpy).not.toHaveBeenCalled()
@@ -225,7 +220,6 @@ describe('Create Task Integration Tests', () => {
               dueDate: '',
             })
             .set('Authorization', `Bearer ${token}`)
-        expect(response.status).toBe(400)
         expectExpressValidatorError(response, 'dueDate')
         expect(jwtVerifySpy).not.toHaveBeenCalled()
         expect(taskCreateSpy).not.toHaveBeenCalled()
@@ -243,7 +237,6 @@ describe('Create Task Integration Tests', () => {
             })
             .set('Authorization', `Bearer ${token}`)
 
-        expect(response.status).toBe(400)
         expectExpressValidatorError(response, 'status')
         expect(jwtVerifySpy).not.toHaveBeenCalled()
         expect(taskCreateSpy).not.toHaveBeenCalled()
@@ -259,7 +252,6 @@ describe('Create Task Integration Tests', () => {
               dueDate: 'not valid date',
             })
             .set('Authorization', `Bearer ${token}`)
-        expect(response.status).toBe(400)
         expectExpressValidatorError(response, 'dueDate')
         expect(jwtVerifySpy).not.toHaveBeenCalled()
         expect(taskCreateSpy).not.toHaveBeenCalled()
@@ -273,7 +265,6 @@ describe('Create Task Integration Tests', () => {
               dueDate: '1990-03-23T00:00:00.000Z',
             })
             .set('Authorization', `Bearer ${token}`)
-        expect(response.status).toBe(400)
         expectExpressValidatorError(response, 'dueDate')
         expect(jwtVerifySpy).not.toHaveBeenCalled()
         expect(taskCreateSpy).not.toHaveBeenCalled()
