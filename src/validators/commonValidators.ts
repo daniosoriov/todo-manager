@@ -1,5 +1,17 @@
-import { body, param } from 'express-validator'
+import { body, header, param } from 'express-validator'
 import { taskStatus } from '@src/types/types'
+
+const headerAuthorization = () =>
+    header('authorization')
+        .notEmpty()
+        .withMessage(`'authorization' is required.`)
+        .trim()
+        .isString()
+        .withMessage(`'authorization' must be a string.`)
+        .custom((value) => {
+          return value.split(' ')[0] === 'Bearer'
+        })
+        .escape()
 
 const bodyEmail = () =>
     body('email')
@@ -94,6 +106,7 @@ const paramTaskId = () =>
 
 export
 {
+  headerAuthorization,
   bodyEmail,
   bodyPassword,
   bodyStringOptional,
