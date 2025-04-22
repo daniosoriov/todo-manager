@@ -2,10 +2,11 @@ import {
   bodyStatusOptional,
   bodyStringOptional,
   bodyDateOptional,
-  paramTaskId,
+  paramTaskId, headerAuthorization,
 } from '@src/validators/commonValidators'
 
 const updateTaskValidators = [
+  headerAuthorization(),
   paramTaskId(),
   bodyStringOptional('title'),
   bodyStatusOptional(),
