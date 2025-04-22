@@ -11,6 +11,9 @@ const reqAuth = {
 } as Partial<Request>
 
 const reqTask = {
+  user: {
+    _id: 'userId',
+  },
   params: { taskId },
 } as Partial<Request>
 
