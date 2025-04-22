@@ -1,15 +1,7 @@
 import { Schema, model } from 'mongoose'
 import jwt from 'jsonwebtoken'
 import bcrypt from 'bcrypt'
-import dotenv from 'dotenv'
-
-dotenv.config()
-
-const { JWT_SECRET } = process.env
-
-if (!JWT_SECRET) {
-  throw new Error('JWT_SECRET is not defined')
-}
+import getEnvVariable from '@src/utils/getEnvVariable'
 
 const userSchema = new Schema(
     {
@@ -41,6 +33,7 @@ const userSchema = new Schema(
          */
         generateAuthToken: async function (): Promise<string> {
           return new Promise((resolve, reject) => {
+            const JWT_SECRET = getEnvVariable('JWT_SECRET')
             jwt.sign({ _id: this._id }, JWT_SECRET, { expiresIn: '24h' }, (err, token) => {
               if (err) {
                 return reject(new Error('Error generating token'))
