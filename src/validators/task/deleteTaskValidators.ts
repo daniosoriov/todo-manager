@@ -1,6 +1,7 @@
-import { paramTaskId } from '@src/validators/commonValidators'
+import { headerAuthorization, paramTaskId } from '@src/validators/commonValidators'
 
 const deleteTaskValidators = [
+  headerAuthorization(),
   paramTaskId(),
 ]
 
