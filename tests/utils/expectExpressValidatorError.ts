@@ -1,6 +1,6 @@
 import { expect } from 'vitest'
 
-type Location = 'body' | 'params' | 'query'
+type Location = 'body' | 'params' | 'query' | 'headers'
 
 interface CustomError {
   path: string
