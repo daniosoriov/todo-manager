@@ -30,6 +30,7 @@ vi.stubEnv('JWT_SECRET', jwtSecret)
 const token = jwt.sign({ _id: 'testUserId' }, jwtSecret, { expiresIn: '1h' })
 const jwtVerifySpy = vi.spyOn(jwt, 'verify')
 const taskFindByIdAndUpdateSpy = vi.spyOn(Task, 'findByIdAndUpdate')
+console.error = vi.fn()
 
 async function successfulUpdate(payload: Partial<typeof Task.schema.obj>) {
   const response = await supertest(app)
