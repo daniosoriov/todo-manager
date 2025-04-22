@@ -1,9 +1,10 @@
-import { NextFunction, Request, Response } from 'express'
+import { NextFunction, Response } from 'express'
 import Task from '@src/models/Task'
+import { JWTRequest } from '@src/types/express'
 
-const getAllTasks = async (req: Request, res: Response, next: NextFunction) => {
+const getAllTasks = async (req: JWTRequest, res: Response, next: NextFunction) => {
   try {
-    const tasks = await Task.find({})
+    const tasks = await Task.find({ userId: req.user!._id })
     if (!tasks) {
       res.status(404).json({ error: 'No tasks found' })
       return next(new Error())
