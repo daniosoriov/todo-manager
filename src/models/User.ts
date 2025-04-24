@@ -3,6 +3,29 @@ import jwt from 'jsonwebtoken'
 import bcrypt from 'bcrypt'
 import getEnvVariable from '@src/utils/getEnvVariable'
 
+const SEVEN_DAYS = 7 * 24 * 60 * 60 // 7 days in seconds
+const TWENTY_FOUR_HOURS = 24 * 60 * 60 // 24 hours in seconds
+
+/**
+ * Generate a JWT token
+ * @param id - User ID
+ * @param secret - Secret key
+ * @param ttl - Time to live in seconds
+ */
+const generateToken = (id: string, secret: string, ttl: number): Promise<string> => {
+  return new Promise((resolve, reject) => {
+    jwt.sign({ _id: id }, secret, { expiresIn: ttl }, (err, token) => {
+      if (err) {
+        return reject(new Error('Error generating token'))
+      }
+      if (!token) {
+        return reject(new Error('Token generation failed'))
+      }
+      resolve(token)
+    })
+  })
+}
+
 const userSchema = new Schema(
     {
       email: {
@@ -32,18 +55,13 @@ const userSchema = new Schema(
          * Generate a JWT token for the user
          */
         generateAuthToken: async function (): Promise<string> {
-          return new Promise((resolve, reject) => {
-            const JWT_SECRET = getEnvVariable('JWT_SECRET')
-            jwt.sign({ _id: this._id }, JWT_SECRET, { expiresIn: '24h' }, (err, token) => {
-              if (err) {
-                return reject(new Error('Error generating token'))
-              }
-              if (!token) {
-                return reject(new Error('Token generation failed'))
-              }
-              resolve(token)
-            })
-          })
+          return generateToken(this._id.toString(), getEnvVariable('JWT_SECRET'), TWENTY_FOUR_HOURS)
+        },
+        /**
+         * Generate a refresh token for the user
+         */
+        generateRefreshToken: async function (): Promise<string> {
+          return generateToken(this._id.toString(), getEnvVariable('JWT_REFRESH_SECRET'), SEVEN_DAYS)
         },
       },
     },
