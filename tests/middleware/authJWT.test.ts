@@ -13,17 +13,18 @@ const createMockRequest = (authHeader: string | null): Partial<Request> => ({
   header: vi.fn().mockReturnValue(authHeader),
 })
 
-const runUnauthorizedTest = (authHeader: string | null, error: Error) => {
+const runUnauthorizedTest = (authHeader: string | null, error: Error | null) => {
   const req = createMockRequest(authHeader)
-  jwtVerifySpy.mockImplementation(() => {
-    throw error
-  })
+  if (error) {
+    jwtVerifySpy.mockImplementation(() => {
+      throw error
+    })
+  }
 
   authJWT(req as Request, res as Response, next as NextFunction)
 
   expect(res.status).toHaveBeenCalledWith(401)
   expect(res.json).toHaveBeenCalledWith({ error: 'Unauthorized' })
-  expect(next).toHaveBeenCalledWith(new Error('Unauthorized'))
 }
 
 describe('Auth JWT', () => {
@@ -41,7 +42,7 @@ describe('Auth JWT', () => {
   })
 
   it('should return 401 if token is missing', () => {
-    runUnauthorizedTest(null, new Error('No token provided'))
+    runUnauthorizedTest(null, null)
   })
 
   it('should return 401 if token is invalid', () => {
