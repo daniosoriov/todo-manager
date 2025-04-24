@@ -10,6 +10,13 @@ vi.mock('@src/models/User', () => ({
   },
 }))
 
+vi.mock('@src/utils/generateAndStoreTokens', () => ({
+  default: vi.fn().mockResolvedValue({
+    newToken: 'mockToken',
+    newRefreshToken: 'mockRefreshToken',
+  }),
+}))
+
 console.error = vi.fn()
 
 describe('Login User Unit Tests', () => {
@@ -20,14 +27,11 @@ describe('Login User Unit Tests', () => {
   it('should login a user successfully', async () => {
     const mockUser = {
       comparePassword: vi.fn().mockResolvedValueOnce(true),
-      generateAuthToken: vi.fn().mockResolvedValueOnce('mockToken'),
-      generateRefreshToken: vi.fn().mockResolvedValueOnce('mockRefreshToken'),
     }
     vi.mocked(User.findOne).mockResolvedValueOnce(mockUser)
     await login(reqAuth as Request, res as Response)
     expect(res.json).toHaveBeenCalledWith({ token: 'mockToken', refreshToken: 'mockRefreshToken' })
     expect(mockUser.comparePassword).toHaveBeenCalledWith(reqAuth.body.password)
-    expect(mockUser.generateAuthToken).toHaveBeenCalled()
   })
 
   it('should return 401 for non-existent user', async () => {
