@@ -8,12 +8,14 @@ import loginValidators from '@src/validators/auth/loginValidators'
 import fieldValidation from '@src/middleware/fieldValidation'
 import login from '@src/api/v1.0/auth/login'
 import User from '@src/models/User'
+import Token from '@src/models/Token'
 
 const app = express()
 app.use(express.json())
 const path = '/v1.0/auth/login'
 app.post(path, loginValidators, fieldValidation, login)
 
+let user: InstanceType<typeof User>
 const mockUser = {
   email: 'test@test.com',
   password: 'password123',
@@ -24,7 +26,7 @@ console.error = vi.fn()
 describe('Login User Integration Tests', () => {
   beforeAll(async () => {
     await connectInMemoryDB()
-    await User.create(mockUser)
+    user = await User.create(mockUser)
   })
 
   beforeEach(() => {
@@ -41,7 +43,21 @@ describe('Login User Integration Tests', () => {
       expect(response.status).toBe(200)
       expect(response.body).toHaveProperty('token')
       expect(response.body).toHaveProperty('refreshToken')
+      const token = await Token.findOne({ userId: user._id })
+      expect(token).toBeDefined()
+      expect(token?.token).toBe(response.body.refreshToken)
       expect(userFindOneSpy).toHaveBeenCalledWith({ email: mockUser.email })
+    })
+
+    //   TODO: It should refresh the token upon login, even if the token existed
+    it('should refresh the token upon login', async () => {
+      const oldToken = 'oldToken'
+      await Token.create({ userId: user._id, token: oldToken })
+      const response = await supertest(app).post(path).send(mockUser)
+      expect(response.status).toBe(200)
+      const token = await Token.findOne({ userId: user._id })
+      expect(token?.token).not.toBe(oldToken)
+      expect(token?.token).toBe(response.body.refreshToken)
     })
   })
 
