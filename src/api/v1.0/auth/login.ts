@@ -1,6 +1,6 @@
 import { Request, Response } from 'express'
+import generateAndStoreTokens from '@src/utils/generateAndStoreTokens'
 import User from '@src/models/User'
-import Token from '@src/models/Token'
 
 const login = async (req: Request, res: Response) => {
   const { email, password } = req.body
@@ -15,10 +15,8 @@ const login = async (req: Request, res: Response) => {
       res.status(401).json({ message: 'Invalid credentials' })
       return
     }
-    const token = await user.generateAuthToken()
-    const refreshToken = await user.generateRefreshToken()
-    Token.findOneAndReplace({ userId: user._id }, { token: refreshToken }, { upsert: true })
-    res.status(200).json({ token, refreshToken })
+    const { newToken, newRefreshToken } = await generateAndStoreTokens(user)
+    res.status(200).json({ token: newToken, refreshToken: newRefreshToken })
   } catch (error) {
     console.error('Error logging in:', error)
     res.status(500).json({ error: 'Internal Server Error' })
