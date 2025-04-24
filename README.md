@@ -4,6 +4,8 @@ A simple and efficient TODO Task Manager RESTful API to help you organize and ma
 
 This project is built with Node.js, Express, and MongoDB, providing a clean and easy-to-use tech stack.
 
+Testing is done using Vitest, ensuring that the API is reliable and bug-free.
+
 This repository supports a set of tutorials:
 
 | Article                                                                                         | Tag                                                                                       |
@@ -12,18 +14,29 @@ This repository supports a set of tutorials:
 | [Adding Tests with Vitest](https://danioshi.substack.com/p/how-to-test-your-nodejs-restful-api) | [v2-tests](https://github.com/daniosoriov/todo-manager/releases/tag/v2-tests)             |
 | Authentication - (Coming soon...)                                                               | v3-auth                                                                                   |
 | Authentication Refresh Tokens - (Coming soon...)                                                | v4-auth-refresh-tokens                                                                    |
-| Advanced Features - (Coming soon...)                                                            | v5-features                                                                               |
+| Authentication Role Based - (Coming soon...)                                                    | v5-auth-role                                                                              |
+| Advanced Features - (Coming soon...)                                                            | v6-features                                                                               |
 
 ## Getting Started
 
 To check out a specific article's code:
 
-description here.
+Go to the URL of the desired `tag` in the repository.
+
+For example, if you want to check out the code for the first article, go to:
+
+```bash
+git checkout v1-api-initial
+```
+
+After you check out the tag, you can run the code locally by following the installation instructions below.
 
 ## Features
 
 - Create, retrieve, update, and delete tasks.
 - Retrieve all tasks available.
+- Authentication and authorization using JWTs (JSON Web Tokens).
+- Automated testing with Vitest.
 
 ## Installation
 
