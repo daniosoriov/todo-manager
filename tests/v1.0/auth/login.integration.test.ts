@@ -40,6 +40,7 @@ describe('Login User Integration Tests', () => {
       const response = await supertest(app).post(path).send(mockUser)
       expect(response.status).toBe(200)
       expect(response.body).toHaveProperty('token')
+      expect(response.body).toHaveProperty('refreshToken')
       expect(userFindOneSpy).toHaveBeenCalledWith({ email: mockUser.email })
     })
   })
