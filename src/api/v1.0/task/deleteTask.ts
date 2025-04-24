@@ -1,8 +1,8 @@
-import { NextFunction, Response } from 'express'
+import { Response } from 'express'
 import Task from '@src/models/Task'
 import { JWTRequest } from '@src/types/express'
 
-const deleteTask = async (req: JWTRequest, res: Response, next: NextFunction) => {
+const deleteTask = async (req: JWTRequest, res: Response) => {
   const taskId = req.params.taskId
   try {
     const task = await Task.findOneAndDelete({ _id: taskId, userId: req.user!._id })

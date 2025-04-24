@@ -1,8 +1,8 @@
-import { NextFunction, Response } from 'express'
+import { Response } from 'express'
 import Task from '@src/models/Task'
 import { JWTRequest } from '@src/types/express'
 
-const updateTask = async (req: JWTRequest, res: Response, next: NextFunction) => {
+const updateTask = async (req: JWTRequest, res: Response) => {
   const taskId = req.params.taskId
   const taskUpdates = req.body
   if (!taskUpdates || Object.keys(taskUpdates).length === 0) {

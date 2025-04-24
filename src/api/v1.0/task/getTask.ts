@@ -1,8 +1,8 @@
-import { NextFunction, Response } from 'express'
+import { Response } from 'express'
 import Task from '@src/models/Task'
 import { JWTRequest } from '@src/types/express'
 
-const getTask = async (req: JWTRequest, res: Response, next: NextFunction) => {
+const getTask = async (req: JWTRequest, res: Response) => {
   try {
     const taskId = req.params.taskId
     const task = await Task.findOne({ _id: taskId, userId: req.user!._id })

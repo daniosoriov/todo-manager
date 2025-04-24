@@ -1,7 +1,7 @@
-import { NextFunction, Request, Response } from 'express'
+import { Request, Response } from 'express'
 import User from '@src/models/User'
 
-const login = async (req: Request, res: Response, next: NextFunction) => {
+const login = async (req: Request, res: Response) => {
   const { email, password } = req.body
   try {
     const user = await User.findOne({ email: email })
