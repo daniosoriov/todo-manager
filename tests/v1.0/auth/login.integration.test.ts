@@ -49,7 +49,6 @@ describe('Login User Integration Tests', () => {
       expect(userFindOneSpy).toHaveBeenCalledWith({ email: mockUser.email })
     })
 
-    //   TODO: It should refresh the token upon login, even if the token existed
     it('should refresh the token upon login', async () => {
       const oldToken = 'oldToken'
       await Token.create({ userId: user._id, token: oldToken })
