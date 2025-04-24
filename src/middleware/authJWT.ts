@@ -8,7 +8,7 @@ const authJWT = (req: JWTRequest, res: Response, next: NextFunction) => {
   const token = req.header('Authorization')?.replace('Bearer ', '')
   if (!token) {
     res.status(401).json({ error: 'Unauthorized' })
-    return next(new Error('Unauthorized'))
+    return
   }
 
   try {
@@ -18,7 +18,7 @@ const authJWT = (req: JWTRequest, res: Response, next: NextFunction) => {
   } catch (error) {
     console.error('Invalid token:', error)
     res.status(401).json({ error: 'Unauthorized' })
-    next(new Error('Unauthorized'))
+    return
   }
 }
 

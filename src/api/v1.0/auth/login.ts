@@ -7,12 +7,12 @@ const login = async (req: Request, res: Response, next: NextFunction) => {
     const user = await User.findOne({ email: email })
     if (!user) {
       res.status(401).json({ message: 'Invalid credentials' })
-      return next(new Error('Invalid credentials'))
+      return
     }
     const isMatch = await user.comparePassword(password)
     if (!isMatch) {
       res.status(401).json({ message: 'Invalid credentials' })
-      return next(new Error('Invalid credentials'))
+      return
     }
     const token = await user.generateAuthToken()
     res.status(200).json({ token })

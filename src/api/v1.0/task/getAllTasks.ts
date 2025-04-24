@@ -7,7 +7,7 @@ const getAllTasks = async (req: JWTRequest, res: Response, next: NextFunction) =
     const tasks = await Task.find({ userId: req.user!._id })
     if (!tasks) {
       res.status(404).json({ error: 'No tasks found' })
-      return next(new Error())
+      return
     }
     res.status(200).json(tasks)
   } catch (error) {

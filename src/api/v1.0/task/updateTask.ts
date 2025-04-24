@@ -7,7 +7,7 @@ const updateTask = async (req: JWTRequest, res: Response, next: NextFunction) =>
   const taskUpdates = req.body
   if (!taskUpdates || Object.keys(taskUpdates).length === 0) {
     res.status(400).json({ error: 'No updates provided' })
-    return next(new Error('No updates provided'))
+    return
   }
 
   try {
@@ -18,7 +18,7 @@ const updateTask = async (req: JWTRequest, res: Response, next: NextFunction) =>
     )
     if (!task) {
       res.status(404).json({ error: 'Task not found' })
-      return next(new Error())
+      return
     }
     res.status(200).json({ message: 'Task updated successfully' })
   } catch (error) {

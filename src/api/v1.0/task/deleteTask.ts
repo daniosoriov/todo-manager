@@ -8,7 +8,7 @@ const deleteTask = async (req: JWTRequest, res: Response, next: NextFunction) =>
     const task = await Task.findOneAndDelete({ _id: taskId, userId: req.user!._id })
     if (!task) {
       res.status(404).json({ error: 'Task not found' })
-      return next(new Error())
+      return
     }
     res.status(200).json({ message: 'Task deleted successfully' })
   } catch (error) {

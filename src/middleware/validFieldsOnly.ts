@@ -11,7 +11,7 @@ const validFieldsOnly = (req: Request, res: Response, next: NextFunction) => {
       error: 'Invalid fields in the request',
       invalidFields,
     })
-    throw new Error('Invalid fields in the request')
+    return
   }
   next()
 }
