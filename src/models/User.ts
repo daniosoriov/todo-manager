@@ -14,7 +14,7 @@ const TWENTY_FOUR_HOURS = 24 * 60 * 60 // 24 hours in seconds
  */
 const generateToken = (id: string, secret: string, ttl: number): Promise<string> => {
   return new Promise((resolve, reject) => {
-    jwt.sign({ _id: id }, secret, { expiresIn: ttl }, (err, token) => {
+    jwt.sign({ _id: id, unique: Date.now() }, secret, { expiresIn: ttl }, (err, token) => {
       if (err) {
         return reject(new Error('Error generating token'))
       }
