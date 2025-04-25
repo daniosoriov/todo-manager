@@ -9,19 +9,19 @@ const refreshToken = async (req: JWTRequest, res: Response) => {
   try {
     const refreshToken = await Token.findOne({ userId: req.user!._id, token })
     if (!refreshToken) {
-      res.status(401).json({ message: 'Invalid refresh token' })
+      res.status(401).json({ error: 'Invalid refresh token' })
       return
     }
     const user = await User.findById(req.user!._id)
     if (!user) {
-      res.status(401).json({ message: 'User not found' })
+      res.status(401).json({ error: 'User not found' })
       return
     }
     const { newToken, newRefreshToken } = await generateAndStoreTokens(user)
     res.status(200).json({ token: newToken, refreshToken: newRefreshToken })
   } catch (error) {
     console.error('Error refreshing token:', error)
-    res.status(500).json({ error: 'Internal server error' })
+    res.status(500).json({ error: 'Internal Server Error' })
   }
 }
 
