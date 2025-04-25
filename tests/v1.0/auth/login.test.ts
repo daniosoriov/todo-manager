@@ -38,7 +38,7 @@ describe('Login User Unit Tests', () => {
     vi.mocked(User.findOne).mockResolvedValueOnce(null)
     await login(reqAuth as Request, res as Response)
     expect(res.status).toHaveBeenCalledWith(401)
-    expect(res.json).toHaveBeenCalledWith({ message: 'Invalid credentials' })
+    expect(res.json).toHaveBeenCalledWith({ error: 'Invalid credentials' })
   })
 
   it('should return 401 for invalid credentials', async () => {
@@ -48,7 +48,7 @@ describe('Login User Unit Tests', () => {
     vi.mocked(User.findOne).mockResolvedValueOnce(mockUser)
     await login(reqAuth as Request, res as Response)
     expect(res.status).toHaveBeenCalledWith(401)
-    expect(res.json).toHaveBeenCalledWith({ message: 'Invalid credentials' })
+    expect(res.json).toHaveBeenCalledWith({ error: 'Invalid credentials' })
     expect(mockUser.comparePassword).toHaveBeenCalledWith(reqAuth.body.password)
   })
 

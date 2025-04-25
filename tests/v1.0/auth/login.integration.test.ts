@@ -102,7 +102,7 @@ describe('Login User Integration Tests', () => {
       const unauthorizedEmail = 'asd@test.com'
       const response = await supertest(app).post(path).send({ email: unauthorizedEmail, password: 'password123' })
       expect(response.status).toBe(401)
-      expect(response.body).toEqual({ message: 'Invalid credentials' })
+      expect(response.body).toEqual({ error: 'Invalid credentials' })
       expect(userFindOneSpy).toHaveBeenCalledWith({ email: unauthorizedEmail })
     })
 
@@ -110,7 +110,7 @@ describe('Login User Integration Tests', () => {
       const invalidPassword = 'wrongPassword'
       const response = await supertest(app).post(path).send({ email: mockUser.email, password: invalidPassword })
       expect(response.status).toBe(401)
-      expect(response.body).toEqual({ message: 'Invalid credentials' })
+      expect(response.body).toEqual({ error: 'Invalid credentials' })
       expect(userFindOneSpy).toHaveBeenCalledWith({ email: mockUser.email })
     })
 
