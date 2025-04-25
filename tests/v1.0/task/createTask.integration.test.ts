@@ -58,7 +58,7 @@ describe('Create Task Integration Tests', () => {
   describe('Successful Cases', () => {
     beforeAll(async () => {
       await connectInMemoryDB()
-      const result = await createTestUserAndToken('test@test.com', 'password', jwtSecret)
+      const result = await createTestUserAndToken('test@test.com', 'password')
       userId = result.userId
       token = result.token
     })
