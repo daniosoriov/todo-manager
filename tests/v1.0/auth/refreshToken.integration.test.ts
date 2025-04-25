@@ -1,0 +1,154 @@
+import express from 'express'
+import { describe, it, expect, vi, beforeAll, afterAll, beforeEach } from 'vitest'
+import supertest from 'supertest'
+import jwt from 'jsonwebtoken'
+import { connectInMemoryDB, disconnectInMemoryDB } from '@tests/utils/mongoMemoryServer'
+import generateAndStoreTokens from '@src/utils/generateAndStoreTokens'
+import expectExpressValidatorError from '@tests/utils/expectExpressValidatorError'
+
+import refreshTokenValidators from '@src/validators/auth/refreshTokenValidators'
+import fieldValidation from '@src/middleware/fieldValidation'
+import refreshToken from '@src/api/v1.0/auth/refreshToken'
+import authJWT from '@src/middleware/authJWT'
+import authRefreshToken from '@src/middleware/authRefreshToken'
+import User from '@src/models/User'
+import Token from '@src/models/Token'
+
+const app = express()
+app.use(express.json())
+const path = '/v1.0/auth/refresh-token'
+app.post(path, refreshTokenValidators, fieldValidation, authJWT, authRefreshToken, refreshToken)
+
+const jwtSecret = 'testSecret'
+const jwtRefreshSecret = 'testRefreshSecret'
+vi.stubEnv('JWT_SECRET', jwtSecret)
+vi.stubEnv('JWT_REFRESH_SECRET', jwtRefreshSecret)
+const jwtVerifySpy = vi.spyOn(jwt, 'verify')
+const tokenFindOneSpy = vi.spyOn(Token, 'findOne')
+const userFindByIdSpy = vi.spyOn(User, 'findById')
+console.error = vi.fn()
+
+let user: InstanceType<typeof User>
+let userId: string
+let testToken: string
+let testRefreshToken: string
+
+describe('Refresh Token Integration Tests', () => {
+  beforeAll(async () => {
+    await connectInMemoryDB()
+    user = await User.create({ email: 'test@test', password: 'password' })
+    userId = user._id.toString()
+  })
+
+  beforeEach(async () => {
+    vi.clearAllMocks()
+    const result = await generateAndStoreTokens(user)
+    testToken = result.newToken
+    testRefreshToken = result.newRefreshToken
+  })
+
+  afterAll(async () => {
+    await disconnectInMemoryDB()
+  })
+
+  describe('Successful Cases', () => {
+    describe('Authorization', () => {
+      it('should return 400 if no token is provided', async () => {
+        const response = await supertest(app).post(path).send({
+          token: testRefreshToken,
+        })
+        expectExpressValidatorError(response, 'authorization', 'headers')
+        expect(jwtVerifySpy).not.toHaveBeenCalled()
+        expect(tokenFindOneSpy).not.toHaveBeenCalled()
+        expect(userFindByIdSpy).not.toHaveBeenCalled()
+      })
+
+      it('should return 401 if an invalid token is provided', async () => {
+        const invalidToken = 'invalidToken'
+        const response = await supertest(app)
+            .post(path)
+            .set('Authorization', `Bearer ${invalidToken}`)
+            .send({ token: 'someToken' })
+        expect(response.status).toBe(401)
+        expect(jwtVerifySpy).toHaveBeenCalledWith(invalidToken, jwtSecret)
+        expect(response.body).toEqual({ error: 'Unauthorized' })
+        expect(jwtVerifySpy).not.toHaveBeenCalledWith('someToken', jwtRefreshSecret)
+        expect(tokenFindOneSpy).not.toHaveBeenCalled()
+        expect(userFindByIdSpy).not.toHaveBeenCalled()
+      })
+    })
+
+    it('should refresh the token successfully', async () => {
+      const response = await supertest(app)
+          .post(path)
+          .send({ token: testRefreshToken })
+          .set('Authorization', `Bearer ${testToken}`)
+      expect(response.status).toBe(200)
+      expect(response.body).toHaveProperty('token')
+      expect(response.body).toHaveProperty('refreshToken')
+      expect(jwtVerifySpy).toHaveBeenCalledWith(testToken, jwtSecret)
+      expect(jwtVerifySpy).toHaveBeenCalledWith(testRefreshToken, jwtRefreshSecret)
+      expect(tokenFindOneSpy).toHaveBeenCalledWith({ userId, token: testRefreshToken })
+      expect(userFindByIdSpy).toHaveBeenCalledWith(userId)
+      expect(response.body.token).not.toEqual(testToken)
+      expect(response.body.refreshToken).not.toEqual(testRefreshToken)
+    })
+  })
+
+  describe('Failure Cases', () => {
+    it('should return 400 for no refresh token', async () => {
+      const response = await supertest(app)
+          .post(path)
+          .set('Authorization', `Bearer ${testToken}`)
+      expectExpressValidatorError(response, 'token', 'body')
+      expect(jwtVerifySpy).not.toHaveBeenCalled()
+      expect(tokenFindOneSpy).not.toHaveBeenCalled()
+      expect(userFindByIdSpy).not.toHaveBeenCalled()
+    })
+
+    it('should return 401 for invalid refresh token', async () => {
+      const invalidRefreshToken = 'invalidRefreshToken'
+      const response = await supertest(app)
+          .post(path)
+          .send({ token: invalidRefreshToken })
+          .set('Authorization', `Bearer ${testToken}`)
+      expect(response.status).toBe(401)
+      expect(jwtVerifySpy).toHaveBeenCalledWith(testToken, jwtSecret)
+      expect(jwtVerifySpy).toHaveBeenCalledWith(invalidRefreshToken, jwtRefreshSecret)
+      expect(tokenFindOneSpy).not.toHaveBeenCalled()
+      expect(userFindByIdSpy).not.toHaveBeenCalled()
+    })
+
+    it('should return 401 for non-existent user', async () => {
+      userFindByIdSpy.mockResolvedValueOnce(null)
+
+      const response = await supertest(app)
+          .post(path)
+          .send({ token: testRefreshToken })
+          .set('Authorization', `Bearer ${testToken}`)
+      expect(response.status).toBe(401)
+      expect(response.body).toEqual({ error: 'User not found' })
+      expect(jwtVerifySpy).toHaveBeenCalledWith(testToken, jwtSecret)
+      expect(jwtVerifySpy).toHaveBeenCalledWith(testRefreshToken, jwtRefreshSecret)
+      expect(tokenFindOneSpy).toHaveBeenCalledWith({ userId, token: testRefreshToken })
+      expect(userFindByIdSpy).toHaveBeenCalledWith(userId)
+    })
+
+    it('should return 500 for database error', async () => {
+      tokenFindOneSpy.mockImplementationOnce(() => {
+        throw new Error('Database error')
+      })
+
+      const response = await supertest(app)
+          .post(path)
+          .send({ token: testRefreshToken })
+          .set('Authorization', `Bearer ${testToken}`)
+      expect(response.status).toBe(500)
+      expect(response.body).toEqual({ error: 'Internal Server Error' })
+      expect(jwtVerifySpy).toHaveBeenCalledWith(testToken, jwtSecret)
+      expect(jwtVerifySpy).toHaveBeenCalledWith(testRefreshToken, jwtRefreshSecret)
+      expect(tokenFindOneSpy).toHaveBeenCalledWith({ userId, token: testRefreshToken })
+      expect(userFindByIdSpy).not.toHaveBeenCalled()
+    })
+  })
+})
