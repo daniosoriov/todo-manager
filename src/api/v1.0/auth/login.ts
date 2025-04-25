@@ -7,12 +7,12 @@ const login = async (req: Request, res: Response) => {
   try {
     const user = await User.findOne({ email: email })
     if (!user) {
-      res.status(401).json({ message: 'Invalid credentials' })
+      res.status(401).json({ error: 'Invalid credentials' })
       return
     }
     const isMatch = await user.comparePassword(password)
     if (!isMatch) {
-      res.status(401).json({ message: 'Invalid credentials' })
+      res.status(401).json({ error: 'Invalid credentials' })
       return
     }
     const { newToken, newRefreshToken } = await generateAndStoreTokens(user)
