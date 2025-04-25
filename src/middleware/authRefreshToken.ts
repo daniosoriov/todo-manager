@@ -5,7 +5,7 @@ import { DecodedToken } from '@src/types/interfaces'
 import { JWTRequest } from '@src/types/express'
 
 const authRefreshToken = (req: JWTRequest, res: Response, next: NextFunction) => {
-  const { token } = req.body
+  const token = req.body?.token
   if (!token) {
     res.status(401).json({ error: 'Unauthorized' })
     return
