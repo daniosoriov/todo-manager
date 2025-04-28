@@ -11,13 +11,14 @@ import fieldValidation from '@src/middleware/fieldValidation'
 import refreshToken from '@src/api/v1.0/auth/refreshToken'
 import authJWT from '@src/middleware/authJWT'
 import authRefreshToken from '@src/middleware/authRefreshToken'
+import rateLimiter, { RATE_LIMITER_LIMIT } from '@src/middleware/rateLimiter'
 import User from '@src/models/User'
 import Token from '@src/models/Token'
 
 const app = express()
 app.use(express.json())
 const path = '/v1.0/auth/refresh-token'
-app.post(path, refreshTokenValidators, fieldValidation, authJWT, authRefreshToken, refreshToken)
+app.post(path, rateLimiter, refreshTokenValidators, fieldValidation, authJWT, authRefreshToken, refreshToken)
 
 const jwtSecret = 'testSecret'
 const jwtRefreshSecret = 'testRefreshSecret'
@@ -149,6 +150,27 @@ describe('Refresh Token Integration Tests', () => {
       expect(jwtVerifySpy).toHaveBeenCalledWith(testRefreshToken, jwtRefreshSecret)
       expect(tokenFindOneSpy).toHaveBeenCalledWith({ userId, token: testRefreshToken })
       expect(userFindByIdSpy).not.toHaveBeenCalled()
+    })
+
+    it('should return 429 after exceeding the rate limit', async () => {
+      const maxRequests = RATE_LIMITER_LIMIT
+      let successfulRequests = 0
+
+      for (let i = 0; i < maxRequests + 10; i++) {
+        const response = await supertest(app)
+            .post(path)
+            .send({ token: testRefreshToken })
+            .set('Authorization', `Bearer ${testToken}`)
+        testToken = response.body.token
+        testRefreshToken = response.body.refreshToken
+        if (response.status === 429) {
+          expect(response.body).toEqual({ error: 'Too many requests, please try again later.' })
+        } else {
+          expect(response.status).toBe(200)
+          successfulRequests++
+        }
+      }
+      expect(successfulRequests).toBeLessThanOrEqual(maxRequests)
     })
   })
 })
