@@ -135,6 +135,20 @@ describe('Refresh Token Integration Tests', () => {
       expect(userFindByIdSpy).toHaveBeenCalledWith(userId)
     })
 
+    it('should return 401 for expired refresh token', async () => {
+      const expiredToken = jwt.sign({ _id: userId }, jwtRefreshSecret, { expiresIn: -1 })
+      const response = await supertest(app)
+          .post(path)
+          .send({ token: expiredToken })
+          .set('Authorization', `Bearer ${testToken}`)
+      expect(response.status).toBe(401)
+      expect(response.body).toEqual({ error: 'Unauthorized' })
+      expect(jwtVerifySpy).toHaveBeenCalledWith(testToken, jwtSecret)
+      expect(jwtVerifySpy).toHaveBeenCalledWith(expiredToken, jwtRefreshSecret)
+      expect(tokenFindOneSpy).not.toHaveBeenCalled()
+      expect(userFindByIdSpy).not.toHaveBeenCalled()
+    })
+
     it('should return 500 for database error', async () => {
       tokenFindOneSpy.mockImplementationOnce(() => {
         throw new Error('Database error')
