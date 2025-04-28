@@ -9,7 +9,10 @@ if (!mongoDBUser || !mongoDBPassword || !mongoDBURI || !mongoDBDatabase) {
   throw new Error('Missing MongoDB connection environment variables')
 }
 
-const uri = `mongodb+srv://${mongoDBUser}:${mongoDBPassword}@${mongoDBURI}/?retryWrites=true&w=majority&appName=${mongoDBDatabase}`
+let uri = `mongodb+srv://${mongoDBUser}:${mongoDBPassword}@${mongoDBURI}/?retryWrites=true&w=majority&appName=${mongoDBDatabase}`
+if (process.env.NODE_ENV !== 'production') {
+  uri = `mongodb://${mongoDBUser}:${mongoDBPassword}@${mongoDBURI}/`
+}
 
 mongoose.connection.on('connected', () => console.log('[server] Mongoose connected'))
 mongoose.connection.on('open', () => console.log('[server] Mongoose open'))
