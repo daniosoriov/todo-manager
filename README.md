@@ -8,14 +8,14 @@ Testing is done using Vitest, ensuring that the API is reliable and bug-free.
 
 This repository supports a set of tutorials:
 
-| Article                                                                                               | Tag                                                                                       |
-|-------------------------------------------------------------------------------------------------------|-------------------------------------------------------------------------------------------|
-| [Setting up the API](https://danioshi.substack.com/p/build-your-first-restful-api-with?r=i9w8u)       | [v1-api-initial](https://github.com/daniosoriov/todo-manager/releases/tag/v1-api-initial) |
-| [Adding Tests with Vitest](https://danioshi.substack.com/p/how-to-test-your-nodejs-restful-api)       | [v2-tests](https://github.com/daniosoriov/todo-manager/releases/tag/v2-tests)             |
-| [Authentication and Authorization](https://danioshi.substack.com/p/securing-your-nodejs-api-with-jwt) | [v3-auth](https://github.com/daniosoriov/todo-manager/releases/tag/v3-auth)               |                                                                                   |
-| Authentication Refresh Tokens - (Coming soon...)                                                      | v4-auth-refresh-tokens                                                                    |
-| Authentication Role Based - (Coming soon...)                                                          | v5-auth-role                                                                              |
-| Advanced Features - (Coming soon...)                                                                  | v6-features                                                                               |
+| Article                                                                                               | Tag                                                                                                       |
+|-------------------------------------------------------------------------------------------------------|-----------------------------------------------------------------------------------------------------------|
+| [Setting up the API](https://danioshi.substack.com/p/build-your-first-restful-api-with?r=i9w8u)       | [v1-api-initial](https://github.com/daniosoriov/todo-manager/releases/tag/v1-api-initial)                 |
+| [Adding Tests with Vitest](https://danioshi.substack.com/p/how-to-test-your-nodejs-restful-api)       | [v2-tests](https://github.com/daniosoriov/todo-manager/releases/tag/v2-tests)                             |
+| [Authentication and Authorization](https://danioshi.substack.com/p/securing-your-nodejs-api-with-jwt) | [v3-auth](https://github.com/daniosoriov/todo-manager/releases/tag/v3-auth)                               |                                                                                   |
+| Authentication Refresh Tokens - (Coming soon...)                                                      | [v4-auth-refresh-tokens](https://github.com/daniosoriov/todo-manager/releases/tag/v4-auth-refresh-tokens) |
+| Authentication Role Based - (Coming soon...)                                                          | v5-auth-role                                                                                              |
+| Advanced Features - (Coming soon...)                                                                  | v6-features                                                                                               |
 
 ## Getting Started
 
@@ -36,6 +36,9 @@ After you check out the tag, you can run the code locally by following the insta
 - Create, retrieve, update, and delete tasks.
 - Retrieve all tasks available.
 - Authentication and authorization using JWTs (JSON Web Tokens).
+- Refresh tokens for secure authentication, including:
+    - Token expiration and renewal.
+    - Rate limiting for the refresh token endpoint.
 - Automated testing with Vitest.
 
 ## Installation
