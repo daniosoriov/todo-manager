@@ -38,8 +38,7 @@
     "jsonwebtoken": "^9.0.2",
     "mongodb": "^6.16.0",
     "mongodb-memory-server": "^10.1.4",
-    "mongoose": "^8.14.0",
-    "rate-limit-memcached": "^1.0.1"
+    "mongoose": "^8.14.0"
   },
   "devDependencies": {
     "@tsconfig/node22": "^22.0.1",
