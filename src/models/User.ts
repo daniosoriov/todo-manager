@@ -3,8 +3,8 @@ import jwt from 'jsonwebtoken'
 import bcrypt from 'bcrypt'
 import getEnvVariable from '@src/utils/getEnvVariable'
 
-const SEVEN_DAYS = 7 * 24 * 60 * 60 // 7 days in seconds
-const TWENTY_FOUR_HOURS = 24 * 60 * 60 // 24 hours in seconds
+const refreshTokenTTL = 7 * 24 * 60 * 60 // 7 days in seconds
+const tokenTTL = 24 * 60 * 60 // 24 hours in seconds
 
 /**
  * Generate a JWT token
@@ -55,13 +55,13 @@ const userSchema = new Schema(
          * Generate a JWT token for the user
          */
         generateAuthToken: async function (): Promise<string> {
-          return generateToken(this._id.toString(), getEnvVariable('JWT_SECRET'), TWENTY_FOUR_HOURS)
+          return generateToken(this._id.toString(), getEnvVariable('JWT_SECRET'), tokenTTL)
         },
         /**
          * Generate a refresh token for the user
          */
         generateRefreshToken: async function (): Promise<string> {
-          return generateToken(this._id.toString(), getEnvVariable('JWT_REFRESH_SECRET'), SEVEN_DAYS)
+          return generateToken(this._id.toString(), getEnvVariable('JWT_REFRESH_SECRET'), refreshTokenTTL)
         },
       },
     },
