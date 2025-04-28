@@ -38,14 +38,14 @@
     "jsonwebtoken": "^9.0.2",
     "mongodb": "^6.16.0",
     "mongodb-memory-server": "^10.1.4",
-    "mongoose": "^8.13.2"
+    "mongoose": "^8.14.0"
   },
   "devDependencies": {
     "@tsconfig/node22": "^22.0.1",
     "@types/bcrypt": "^5.0.2",
     "@types/express": "^5.0.1",
     "@types/jsonwebtoken": "^9.0.9",
-    "@types/node": "^22.14.1",
+    "@types/node": "^22.15.3",
     "@types/supertest": "^6.0.3",
     "supertest": "^7.1.0",
     "ts-node": "^10.9.2",
