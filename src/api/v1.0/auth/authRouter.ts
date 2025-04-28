@@ -10,11 +10,20 @@ import refreshTokenValidators from '@src/validators/auth/refreshTokenValidators'
 import authJWT from '@src/middleware/authJWT'
 import authRefreshToken from '@src/middleware/authRefreshToken'
 import fieldValidation from '@src/middleware/fieldValidation'
+import rateLimiter from '@src/middleware/rateLimiter'
 
 const authRouter = express.Router()
 
 authRouter.post('/register', registerValidators, fieldValidation, register)
 authRouter.post('/login', loginValidators, fieldValidation, login)
-authRouter.post('/refresh-token', refreshTokenValidators, fieldValidation, authJWT, authRefreshToken, refreshToken)
+authRouter.post(
+    '/refresh-token',
+    rateLimiter,
+    refreshTokenValidators,
+    fieldValidation,
+    authJWT,
+    authRefreshToken,
+    refreshToken,
+)
 
 export default authRouter
