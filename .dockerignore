@@ -15,6 +15,7 @@ coverage/
 *.ts
 *.map
 .env
+.env.prod
 test/
 __tests__/
 *.swp
