@@ -8,16 +8,12 @@ services:
       - .:/usr/src/app
     ports:
       - "3000:3000"
-    env_file:
-      - .env.dev
     depends_on:
       - mongo
 
   mongo:
     image: mongo
     restart: always
-    env_file:
-      - .env.dev
     environment:
       MONGO_INITDB_ROOT_USERNAME: ${MONGODB_USER}
       MONGO_INITDB_ROOT_PASSWORD: ${MONGODB_PASSWORD}
