@@ -9,7 +9,6 @@ import expectExpressValidatorError from '@tests/utils/expectExpressValidatorErro
 import refreshTokenValidators from '@src/validators/auth/refreshTokenValidators'
 import fieldValidation from '@src/middleware/fieldValidation'
 import refreshToken from '@src/api/v1.0/auth/refreshToken'
-import authJWT from '@src/middleware/authJWT'
 import authRefreshToken from '@src/middleware/authRefreshToken'
 import rateLimiter, { RATE_LIMITER_LIMIT } from '@src/middleware/rateLimiter'
 import User from '@src/models/User'
@@ -18,7 +17,7 @@ import Token from '@src/models/Token'
 const app = express()
 app.use(express.json())
 const path = '/v1.0/auth/refresh-token'
-app.post(path, rateLimiter, refreshTokenValidators, fieldValidation, authJWT, authRefreshToken, refreshToken)
+app.post(path, rateLimiter, refreshTokenValidators, fieldValidation, authRefreshToken, refreshToken)
 
 const jwtSecret = 'testSecret'
 const jwtRefreshSecret = 'testRefreshSecret'
@@ -53,41 +52,13 @@ describe('Refresh Token Integration Tests', () => {
   })
 
   describe('Successful Cases', () => {
-    describe('Authorization', () => {
-      it('should return 400 if no token is provided', async () => {
-        const response = await supertest(app).post(path).send({
-          token: testRefreshToken,
-        })
-        expectExpressValidatorError(response, 'authorization', 'headers')
-        expect(jwtVerifySpy).not.toHaveBeenCalled()
-        expect(tokenFindOneSpy).not.toHaveBeenCalled()
-        expect(userFindByIdSpy).not.toHaveBeenCalled()
-      })
-
-      it('should return 401 if an invalid token is provided', async () => {
-        const invalidToken = 'invalidToken'
-        const response = await supertest(app)
-            .post(path)
-            .set('Authorization', `Bearer ${invalidToken}`)
-            .send({ token: 'someToken' })
-        expect(response.status).toBe(401)
-        expect(jwtVerifySpy).toHaveBeenCalledWith(invalidToken, jwtSecret)
-        expect(response.body).toEqual({ error: 'Unauthorized' })
-        expect(jwtVerifySpy).not.toHaveBeenCalledWith('someToken', jwtRefreshSecret)
-        expect(tokenFindOneSpy).not.toHaveBeenCalled()
-        expect(userFindByIdSpy).not.toHaveBeenCalled()
-      })
-    })
-
     it('should refresh the token successfully', async () => {
       const response = await supertest(app)
           .post(path)
           .send({ token: testRefreshToken })
-          .set('Authorization', `Bearer ${testToken}`)
       expect(response.status).toBe(200)
       expect(response.body).toHaveProperty('token')
       expect(response.body).toHaveProperty('refreshToken')
-      expect(jwtVerifySpy).toHaveBeenCalledWith(testToken, jwtSecret)
       expect(jwtVerifySpy).toHaveBeenCalledWith(testRefreshToken, jwtRefreshSecret)
       expect(tokenFindOneSpy).toHaveBeenCalledWith({ userId, token: testRefreshToken })
       expect(userFindByIdSpy).toHaveBeenCalledWith(userId)
@@ -100,7 +71,6 @@ describe('Refresh Token Integration Tests', () => {
     it('should return 400 for no refresh token', async () => {
       const response = await supertest(app)
           .post(path)
-          .set('Authorization', `Bearer ${testToken}`)
       expectExpressValidatorError(response, 'token', 'body')
       expect(jwtVerifySpy).not.toHaveBeenCalled()
       expect(tokenFindOneSpy).not.toHaveBeenCalled()
@@ -112,9 +82,7 @@ describe('Refresh Token Integration Tests', () => {
       const response = await supertest(app)
           .post(path)
           .send({ token: invalidRefreshToken })
-          .set('Authorization', `Bearer ${testToken}`)
       expect(response.status).toBe(401)
-      expect(jwtVerifySpy).toHaveBeenCalledWith(testToken, jwtSecret)
       expect(jwtVerifySpy).toHaveBeenCalledWith(invalidRefreshToken, jwtRefreshSecret)
       expect(tokenFindOneSpy).not.toHaveBeenCalled()
       expect(userFindByIdSpy).not.toHaveBeenCalled()
@@ -126,10 +94,8 @@ describe('Refresh Token Integration Tests', () => {
       const response = await supertest(app)
           .post(path)
           .send({ token: testRefreshToken })
-          .set('Authorization', `Bearer ${testToken}`)
       expect(response.status).toBe(401)
       expect(response.body).toEqual({ error: 'User not found' })
-      expect(jwtVerifySpy).toHaveBeenCalledWith(testToken, jwtSecret)
       expect(jwtVerifySpy).toHaveBeenCalledWith(testRefreshToken, jwtRefreshSecret)
       expect(tokenFindOneSpy).toHaveBeenCalledWith({ userId, token: testRefreshToken })
       expect(userFindByIdSpy).toHaveBeenCalledWith(userId)
@@ -140,10 +106,8 @@ describe('Refresh Token Integration Tests', () => {
       const response = await supertest(app)
           .post(path)
           .send({ token: expiredToken })
-          .set('Authorization', `Bearer ${testToken}`)
       expect(response.status).toBe(401)
       expect(response.body).toEqual({ error: 'Unauthorized' })
-      expect(jwtVerifySpy).toHaveBeenCalledWith(testToken, jwtSecret)
       expect(jwtVerifySpy).toHaveBeenCalledWith(expiredToken, jwtRefreshSecret)
       expect(tokenFindOneSpy).not.toHaveBeenCalled()
       expect(userFindByIdSpy).not.toHaveBeenCalled()
@@ -157,10 +121,8 @@ describe('Refresh Token Integration Tests', () => {
       const response = await supertest(app)
           .post(path)
           .send({ token: testRefreshToken })
-          .set('Authorization', `Bearer ${testToken}`)
       expect(response.status).toBe(500)
       expect(response.body).toEqual({ error: 'Internal Server Error' })
-      expect(jwtVerifySpy).toHaveBeenCalledWith(testToken, jwtSecret)
       expect(jwtVerifySpy).toHaveBeenCalledWith(testRefreshToken, jwtRefreshSecret)
       expect(tokenFindOneSpy).toHaveBeenCalledWith({ userId, token: testRefreshToken })
       expect(userFindByIdSpy).not.toHaveBeenCalled()
@@ -174,8 +136,6 @@ describe('Refresh Token Integration Tests', () => {
         const response = await supertest(app)
             .post(path)
             .send({ token: testRefreshToken })
-            .set('Authorization', `Bearer ${testToken}`)
-        testToken = response.body.token
         testRefreshToken = response.body.refreshToken
         if (response.status === 429) {
           expect(response.body).toEqual({ error: 'Too many requests, please try again later.' })
