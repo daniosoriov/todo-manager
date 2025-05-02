@@ -1,7 +1,6 @@
-import { bodyStringRequired, headerAuthorization } from '@src/validators/commonValidators'
+import { bodyStringRequired } from '@src/validators/commonValidators'
 
 const refreshTokenValidators = [
-  headerAuthorization(),
   bodyStringRequired('token'),
 ]
 
