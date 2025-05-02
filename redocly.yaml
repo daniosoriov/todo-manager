@@ -1,6 +1,7 @@
 apis:
   todo@v1:
     root: openapi/openapi.yaml
+    output: src/docs/v1.0/openapi.yaml
 extends:
   - recommended
 rules:
