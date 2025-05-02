@@ -1,0 +1,68 @@
+openapi: 3.1.0
+info:
+  version: 1.0.0
+  title: TODO Task Manager API
+  contact:
+    name: Daniel Osorio
+    email: danioshi@gmail.com
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  description: This is the API definition for the TODO Task Manager API.
+
+externalDocs:
+  description: "Check out the GitHub repository."
+  url: 'https://github.com/daniosoriov/todo-manager'
+tags:
+  - name: Auth
+    description: "Authentication and authorization operations."
+  - name: Task
+    description: "Operations related to tasks."
+
+servers:
+  - url: { http-protocol }://{address}:{port}/v1.0
+    description: Localhost Development Server
+    variables:
+      http-protocol:
+        default: http
+        description: The protocol to use
+        enum:
+          - http
+          - https
+      address:
+        default: localhost
+        description: The address to use
+        enum:
+          - localhost
+          - example.com
+      port:
+        default: 3000
+        description: The port to use
+        enum:
+          - 80
+          - 3000
+paths:
+  /auth/login:
+    $ref: 'paths/auth/login.yaml'
+  /auth/signup:
+    $ref: 'paths/auth/signup.yaml'
+  /auth/refresh-token:
+    $ref: 'paths/auth/refresh-token.yaml'
+  /task/create:
+    $ref: 'paths/task/create.yaml'
+  /task/delete:
+    $ref: 'paths/task/delete.yaml'
+  /task/{taskId}:
+    $ref: 'paths/task/get_{taskId}.yaml'
+  /task/{taskId}/update:
+    $ref: 'paths/task/update_{taskId}.yaml'
+
+security:
+  - BearerAuth: [ ]
+
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
