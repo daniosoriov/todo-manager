@@ -8,14 +8,15 @@ Testing is done using Vitest, ensuring that the API is reliable and bug-free.
 
 This repository supports a set of tutorials:
 
-| Article                                                                                               | GitHub Tag                                                                                                |
+| Article                                                                                               | Tag                                                                                                       |
 |-------------------------------------------------------------------------------------------------------|-----------------------------------------------------------------------------------------------------------|
 | [Setting up the API](https://danioshi.substack.com/p/build-your-first-restful-api-with?r=i9w8u)       | [v1-api-initial](https://github.com/daniosoriov/todo-manager/releases/tag/v1-api-initial)                 |
 | [Adding Tests with Vitest](https://danioshi.substack.com/p/how-to-test-your-nodejs-restful-api)       | [v2-tests](https://github.com/daniosoriov/todo-manager/releases/tag/v2-tests)                             |
 | [Authentication and Authorization](https://danioshi.substack.com/p/securing-your-nodejs-api-with-jwt) | [v3-auth](https://github.com/daniosoriov/todo-manager/releases/tag/v3-auth)                               |                                                                                   |
-| [Authentication Refresh Tokens](https://danioshi.substack.com/p/enhancing-your-nodejs-restful-api)    | [v4-auth-refresh-tokens](https://github.com/daniosoriov/todo-manager/releases/tag/v4-auth-refresh-tokens) |
-| Authentication Role Based - (Coming soon...)                                                          | v5-auth-role                                                                                              |
-| Advanced Features - (Coming soon...)                                                                  | v6-features                                                                                               |
+| Authentication Refresh Tokens - (Coming soon...)                                                      | [v4-auth-refresh-tokens](https://github.com/daniosoriov/todo-manager/releases/tag/v4-auth-refresh-tokens) |
+| Docker Containerization - (Coming soon...)                                                            | v5-docker                                                                                                 |
+| Authentication Role Based - (Coming soon...)                                                          | v6-auth-role                                                                                              |
+| Advanced Features - (Coming soon...)                                                                  | v7-features                                                                                               |
 
 ## Getting Started
 
@@ -58,13 +59,69 @@ After you check out the tag, you can run the code locally by following the insta
 
 ## Usage
 
-Start the server:
+This project uses **Docker** and **Docker Compose** to set up and run the server, along with a local instance of
+MongoDB. A web interface for managing MongoDB is also available for convenience.
+
+### Prerequisites
+
+Before getting started, make sure you have the following tools installed on your machine:
+
+- [Docker](https://docs.docker.com/get-docker/)
+- [Docker Compose](https://docs.docker.com/compose/install/)
+
+### Steps to Run the Application
+
+#### Build the Docker Images
+
+Run the following command to build the Docker images for the server and MongoDB:
 
 ```bash
-npm start
+docker-compose -f docker-compose.yaml build
 ```
 
-Now the server is running on `http://localhost:3000`.
+#### Start the Containers
+
+Once the images are built, start the containers in detached mode (background):
+
+```bash
+docker-compose -f docker-compose.yaml up -d
+```
+
+This command will:
+
+- Launch the server accessible via the local API URL.
+- Spin up a MongoDB container along with a web-based MongoDB management interface.
+
+#### Access the Services
+
+After starting the containers, you can access the following services:
+
+- API: [http://localhost:3000](http://localhost:3000)
+- MongoDB Web Interface (via Mongo Express): [http://localhost:8081](http://localhost:8081)
+
+The Mongo Express interface allows you to interact with the MongoDB database directly from your browser.
+
+#### Stopping the Containers
+
+To stop the running containers and keep their data and state intact, use this command:
+
+```bash
+docker-compose -f docker-compose.yaml stop
+```
+
+To completely shut down and remove the containers (along with their associated networks and volumes), use:
+
+```bash
+docker-compose -f docker-compose.yaml down
+```
+
+- By default, the API will be hosted on port `3000`, and the MongoDB web interface will run on port `8081`. Make sure
+  these ports are not in use before starting the containers.
+- If you want to rebuild the images (e.g., after making changes to the code), run:
+
+```bash
+docker-compose -f docker-compose.yaml build --no-cache
+```
 
 ## Scripts
 

@@ -1,6 +1,6 @@
 import { Schema, model } from 'mongoose'
 import jwt from 'jsonwebtoken'
-import bcrypt from 'bcrypt'
+import bcrypt from 'bcryptjs'
 import getEnvVariable from '@src/utils/getEnvVariable'
 
 const refreshTokenTTL = 7 * 24 * 60 * 60 // 7 days in seconds
