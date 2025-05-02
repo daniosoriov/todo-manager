@@ -13,10 +13,12 @@ This repository supports a set of tutorials:
 | [Setting up the API](https://danioshi.substack.com/p/build-your-first-restful-api-with?r=i9w8u)       | [v1-api-initial](https://github.com/daniosoriov/todo-manager/releases/tag/v1-api-initial)                 |
 | [Adding Tests with Vitest](https://danioshi.substack.com/p/how-to-test-your-nodejs-restful-api)       | [v2-tests](https://github.com/daniosoriov/todo-manager/releases/tag/v2-tests)                             |
 | [Authentication and Authorization](https://danioshi.substack.com/p/securing-your-nodejs-api-with-jwt) | [v3-auth](https://github.com/daniosoriov/todo-manager/releases/tag/v3-auth)                               |                                                                                   |
-| Authentication Refresh Tokens - (Coming soon...)                                                      | [v4-auth-refresh-tokens](https://github.com/daniosoriov/todo-manager/releases/tag/v4-auth-refresh-tokens) |
-| Docker Containerization - (Coming soon...)                                                            | v5-docker                                                                                                 |
-| Authentication Role Based - (Coming soon...)                                                          | v6-auth-role                                                                                              |
-| Advanced Features - (Coming soon...)                                                                  | v7-features                                                                                               |
+| [Authentication Refresh Tokens](https://danioshi.substack.com/p/enhancing-your-nodejs-restful-api)    | [v4-auth-refresh-tokens](https://github.com/daniosoriov/todo-manager/releases/tag/v4-auth-refresh-tokens) |
+| Docker Containerization - (Coming soon...)                                                            | [v5-docker](https://github.com/daniosoriov/todo-manager/releases/tag/v5-docker)                           |
+| OpenAPI Documentation - (Coming soon...)                                                              | v6-openapi-doc                                                                                            |
+| Valibot Schema Validation - (Coming soon...)                                                          | v7-valibot                                                                                                |
+| Authentication Role Based - (Coming soon...)                                                          | v8-auth-role                                                                                              |
+| Advanced Features - (Coming soon...)                                                                  | v9-features                                                                                               |
 
 ## Getting Started
 
