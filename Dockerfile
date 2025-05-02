@@ -1,4 +1,4 @@
-FROM node:22
+FROM node:22-bullseye
 WORKDIR /usr/src/app
 RUN npm install -g nodemon
 COPY package*.json ./
