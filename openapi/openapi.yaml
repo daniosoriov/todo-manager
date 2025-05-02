@@ -25,22 +25,19 @@ servers:
     variables:
       http-protocol:
         default: http
-        description: The protocol to use
         enum:
           - http
           - https
       address:
         default: localhost
-        description: The address to use
         enum:
           - localhost
           - example.com
       port:
-        default: 3000
-        description: The port to use
+        default: '3000'
         enum:
-          - 80
-          - 3000
+          - '80'
+          - '3000'
 paths:
   /auth/login:
     $ref: 'paths/auth/login.yaml'
