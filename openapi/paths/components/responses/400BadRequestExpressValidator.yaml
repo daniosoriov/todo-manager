@@ -1,0 +1,23 @@
+description: Bad Request
+content:
+  application/json:
+    schema:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            type: object
+            properties:
+              location:
+                type: string
+                example: body
+              msg:
+                type: string
+                example: Invalid input data
+              param:
+                type: string
+                example: name
+              value:
+                type: string
+                example: ''
