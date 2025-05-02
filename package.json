@@ -39,7 +39,8 @@
     "mongodb": "^6.16.0",
     "mongodb-memory-server": "^10.1.4",
     "mongoose": "^8.14.1",
-    "swagger-ui-express": "^5.0.1"
+    "swagger-ui-express": "^5.0.1",
+    "yaml": "^2.7.1"
   },
   "devDependencies": {
     "@tsconfig/node22": "^22.0.1",
