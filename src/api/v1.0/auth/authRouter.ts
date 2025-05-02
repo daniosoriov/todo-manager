@@ -7,7 +7,6 @@ import loginValidators from '@src/validators/auth/loginValidators'
 import registerValidators from '@src/validators/auth/registerValidators'
 import refreshTokenValidators from '@src/validators/auth/refreshTokenValidators'
 
-import authJWT from '@src/middleware/authJWT'
 import authRefreshToken from '@src/middleware/authRefreshToken'
 import fieldValidation from '@src/middleware/fieldValidation'
 import rateLimiter from '@src/middleware/rateLimiter'
@@ -21,7 +20,6 @@ authRouter.post(
     rateLimiter,
     refreshTokenValidators,
     fieldValidation,
-    authJWT,
     authRefreshToken,
     refreshToken,
 )
