@@ -1,0 +1,37 @@
+post:
+  tags:
+    - Auth
+  summary: Login
+  description: Login to the application and receive JWT tokens.
+  operationId: login
+  requestBody:
+    content:
+      application/json:
+        schema:
+          type: object
+          properties:
+            email:
+              $ref: "../components/schemas/Email.yaml"
+            password:
+              $ref: "../components/schemas/Password.yaml"
+    required: true
+  responses:
+    '200':
+      description: Successful login
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              token:
+                description: Access token for authentication
+                type: string
+              refreshToken:
+                description: Refresh token for obtaining new access tokens
+                type: string
+    '400':
+      $ref: "../components/responses/400BadRequestExpressValidator.yaml"
+    '401':
+      $ref: "../components/responses/401Unauthorized.yaml"
+    '500':
+      $ref: "../components/responses/500InternalServerError.yaml"
