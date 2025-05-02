@@ -1,0 +1,8 @@
+apis:
+  todo@v1:
+    root: openapi/openapi.yaml
+extends:
+  - recommended
+rules:
+  no-unused-components: error
+  no-server-example.com: off
