@@ -8,9 +8,14 @@ import { MongoMemoryServer } from 'mongodb-memory-server'
 let mongoServer: MongoMemoryServer
 
 export const connectInMemoryDB = async () => {
-  mongoServer = await MongoMemoryServer.create()
-  const uri = mongoServer.getUri()
-  await mongoose.connect(uri)
+  try {
+    mongoServer = await MongoMemoryServer.create()
+    const uri = mongoServer.getUri()
+    await mongoose.connect(uri)
+  } catch (error) {
+    console.error('Error connecting to in-memory MongoDB:', error)
+    throw error
+  }
 }
 
 export const disconnectInMemoryDB = async () => {
