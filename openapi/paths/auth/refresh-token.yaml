@@ -1,0 +1,31 @@
+post:
+  tags:
+    - Auth
+  summary: Refresh Token
+  description: Refresh the JWT access token using the refresh token.
+  operationId: refresh-token
+  requestBody:
+    content:
+      application/json:
+        schema:
+          type: object
+          properties:
+            token:
+              $ref: "../components/schemas/Token.yaml"
+              description: The refresh token used to obtain a new access token.
+    required: true
+  responses:
+    '200':
+      description: Successful token refresh
+      content:
+        application/json:
+          schema:
+            $ref: "../components/schemas/Tokens.yaml"
+    '400':
+      $ref: "../components/responses/400BadRequestOneOf.yaml"
+    '401':
+      $ref: "../components/responses/401Unauthorized.yaml"
+    '429':
+      $ref: "../components/responses/429TooManyRequests.yaml"
+    '500':
+      $ref: "../components/responses/500InternalServerError.yaml"
