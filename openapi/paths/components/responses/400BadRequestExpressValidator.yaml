@@ -1,4 +1,4 @@
-description: Bad Request
+description: Bad Request Express Validator
 content:
   application/json:
     schema:

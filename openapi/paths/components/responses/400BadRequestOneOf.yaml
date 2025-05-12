@@ -1,0 +1,7 @@
+description: Bad Request One Of
+content:
+  application/json:
+    schema:
+      oneOf:
+        - $ref: "400BadRequestExpressValidator.yaml"
+        - $ref: "400BadRequest.yaml"
