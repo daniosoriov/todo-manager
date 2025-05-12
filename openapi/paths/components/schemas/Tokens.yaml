@@ -1,0 +1,9 @@
+description: Tokens for authentication
+type: object
+properties:
+  token:
+    $ref: 'Token.yaml'
+    description: Access token for authentication
+  refreshToken:
+    $ref: 'Token.yaml'
+    description: Refresh token for obtaining new access tokens

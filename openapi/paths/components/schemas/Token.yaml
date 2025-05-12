@@ -1,0 +1,4 @@
+description: "User's authentication token."
+type: string
+format: jwt
+example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
