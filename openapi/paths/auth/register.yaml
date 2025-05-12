@@ -1,0 +1,32 @@
+post:
+  tags:
+    - Auth
+  summary: Register
+  description: Register a new user in the application.
+  operationId: register
+  requestBody:
+    content:
+      application/json:
+        schema:
+          type: object
+          properties:
+            email:
+              $ref: "../components/schemas/Email.yaml"
+            password:
+              $ref: "../components/schemas/Password.yaml"
+    required: true
+  responses:
+    '201':
+      description: Successful registration
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              message:
+                description: Success message
+                type: string
+    '400':
+      $ref: "../components/responses/400BadRequestOneOf.yaml"
+    '500':
+      $ref: "../components/responses/500InternalServerError.yaml"
