@@ -1,0 +1,29 @@
+tags:
+  - Task
+summary: Get
+description: Get a task.
+operationId: task-get
+security:
+  - BearerAuth: [ ]
+parameters:
+  - name: taskId
+    in: path
+    required: true
+    description: The ID of the task to retrieve.
+    schema:
+      $ref: "../components/schemas/ID.yaml"
+responses:
+  '200':
+    description: Task successfully retrieved
+    content:
+      application/json:
+        schema:
+          $ref: "../components/schemas/Task.yaml"
+  '400':
+    $ref: "../components/responses/400BadRequestOneOf.yaml"
+  '401':
+    $ref: "../components/responses/401Unauthorized.yaml"
+  '404':
+    $ref: "../components/responses/404NotFound.yaml"
+  '500':
+    $ref: "../components/responses/500InternalServerError.yaml"
