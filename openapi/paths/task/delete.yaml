@@ -9,7 +9,7 @@ parameters:
   - name: taskId
     in: path
     required: true
-    description: The ID of the task to be deleted.
+    description: The ID of the task to delete.
     schema:
       $ref: "../components/schemas/ID.yaml"
 responses:
