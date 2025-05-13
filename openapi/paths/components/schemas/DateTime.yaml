@@ -1,0 +1,4 @@
+description: Date time in ISO 8601 format.
+type: string
+format: date-time
+example: "2025-04-22T13:34:38.624+00:00"
