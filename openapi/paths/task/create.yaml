@@ -1,7 +1,7 @@
 tags:
   - Task
 summary: Create
-description: Create a new task in the application.
+description: Create a new task.
 operationId: task-create
 security:
   - BearerAuth: [ ]
@@ -14,7 +14,7 @@ requestBody:
           title:
             $ref: "../components/schemas/TaskTitle.yaml"
             required: true
-          'description':
+          description:
             $ref: "../components/schemas/TaskDescription.yaml"
             required: false
           status:
