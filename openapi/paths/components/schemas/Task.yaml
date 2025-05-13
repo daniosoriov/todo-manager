@@ -1,0 +1,23 @@
+description: Task
+type: object
+properties:
+  id:
+    $ref: 'ID.yaml'
+    description: ID of the task.
+  title:
+    $ref: 'TaskTitle.yaml'
+  description:
+    $ref: 'TaskDescription.yaml'
+  status:
+    $ref: 'TaskStatus.yaml'
+  dueDate:
+    $ref: 'Date.yaml'
+  userId:
+    $ref: 'ID.yaml'
+    description: User ID associated with the task.
+  createdAt:
+    $ref: 'DateTime.yaml'
+    description: Timestamp when the task was created.
+  updatedAt:
+    $ref: 'DateTime.yaml'
+    description: Timestamp when the task was last updated.
