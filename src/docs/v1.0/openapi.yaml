@@ -1,0 +1,484 @@
+openapi: 3.1.0
+info:
+  version: 1.0.0
+  title: TODO Task Manager API
+  contact:
+    name: Daniel Osorio
+    email: danioshi@gmail.com
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  description: This is the API definition for the TODO Task Manager API.
+servers:
+  - url: http://localhost:{port}/v1.0
+    description: Localhost Development Server
+    variables:
+      port:
+        default: '3000'
+        enum:
+          - '80'
+          - '3000'
+security:
+  - BearerAuth: []
+tags:
+  - name: Auth
+    description: Authentication and authorization operations.
+  - name: Task
+    description: Operations related to tasks.
+externalDocs:
+  description: Check out the GitHub repository.
+  url: https://github.com/daniosoriov/todo-manager
+paths:
+  /auth/login:
+    post:
+      tags:
+        - Auth
+      summary: Login
+      description: Login to the application and receive JWT tokens.
+      operationId: login
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  $ref: '#/components/schemas/Email'
+                password:
+                  $ref: '#/components/schemas/Password'
+        required: true
+      responses:
+        '200':
+          description: Successful login
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Tokens'
+        '400':
+          $ref: '#/components/responses/400BadRequestExpressValidator'
+        '401':
+          $ref: '#/components/responses/401Unauthorized'
+        '500':
+          $ref: '#/components/responses/500InternalServerError'
+  /auth/signup:
+    post:
+      tags:
+        - Auth
+      summary: Register
+      description: Register a new user in the application.
+      operationId: register
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  $ref: '#/components/schemas/Email'
+                password:
+                  $ref: '#/components/schemas/Password'
+        required: true
+      responses:
+        '201':
+          description: Successful registration
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    description: Success message
+                    type: string
+        '400':
+          $ref: '#/components/responses/400BadRequestOneOf'
+        '500':
+          $ref: '#/components/responses/500InternalServerError'
+  /auth/refresh-token:
+    post:
+      tags:
+        - Auth
+      summary: Refresh Token
+      description: Refresh the JWT access token using the refresh token.
+      operationId: refresh-token
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                token:
+                  $ref: '#/components/schemas/Token'
+                  description: The refresh token used to obtain a new access token.
+        required: true
+      responses:
+        '200':
+          description: Successful token refresh
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Tokens'
+        '400':
+          $ref: '#/components/responses/400BadRequestOneOf'
+        '401':
+          $ref: '#/components/responses/401Unauthorized'
+        '429':
+          $ref: '#/components/responses/429TooManyRequests'
+        '500':
+          $ref: '#/components/responses/500InternalServerError'
+  /task:
+    post:
+      tags:
+        - Task
+      summary: Create
+      description: Create a new task.
+      operationId: task-create
+      security:
+        - BearerAuth: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                title:
+                  $ref: '#/components/schemas/TaskTitle'
+                  required: true
+                description:
+                  $ref: '#/components/schemas/TaskDescription'
+                  required: false
+                status:
+                  $ref: '#/components/schemas/TaskStatus'
+                  required: false
+                dueDate:
+                  $ref: '#/components/schemas/Date'
+                  required: true
+      responses:
+        '201':
+          description: Created task successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Task'
+        '400':
+          $ref: '#/components/responses/400BadRequestOneOf'
+        '401':
+          $ref: '#/components/responses/401Unauthorized'
+        '500':
+          $ref: '#/components/responses/500InternalServerError'
+  /task/{taskId}:
+    get:
+      tags:
+        - Task
+      summary: Get
+      description: Get a task.
+      operationId: task-get
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: taskId
+          in: path
+          required: true
+          description: The ID of the task to retrieve.
+          schema:
+            $ref: '#/components/schemas/ID'
+      responses:
+        '200':
+          description: Task successfully retrieved
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Task'
+        '400':
+          $ref: '#/components/responses/400BadRequestOneOf'
+        '401':
+          $ref: '#/components/responses/401Unauthorized'
+        '404':
+          $ref: '#/components/responses/404NotFound'
+        '500':
+          $ref: '#/components/responses/500InternalServerError'
+    put:
+      tags:
+        - Task
+      summary: Update
+      description: Update a task.
+      operationId: task-update
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: taskId
+          in: path
+          required: true
+          description: The ID of the task to update.
+          schema:
+            $ref: '#/components/schemas/ID'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                title:
+                  $ref: '#/components/schemas/TaskTitle'
+                  required: false
+                description:
+                  $ref: '#/components/schemas/TaskDescription'
+                  required: false
+                status:
+                  $ref: '#/components/schemas/TaskStatus'
+                  required: false
+                dueDate:
+                  $ref: '#/components/schemas/Date'
+                  required: false
+      responses:
+        '200':
+          description: Updated task successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    description: Success message
+                    type: string
+        '400':
+          $ref: '#/components/responses/400BadRequestOneOf'
+        '401':
+          $ref: '#/components/responses/401Unauthorized'
+        '404':
+          $ref: '#/components/responses/404NotFound'
+        '500':
+          $ref: '#/components/responses/500InternalServerError'
+    delete:
+      tags:
+        - Task
+      summary: Delete
+      description: Delete a task.
+      operationId: task-delete
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: taskId
+          in: path
+          required: true
+          description: The ID of the task to delete.
+          schema:
+            $ref: '#/components/schemas/ID'
+      responses:
+        '200':
+          description: Deleted task successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    description: Success message
+                    type: string
+        '400':
+          $ref: '#/components/responses/400BadRequestOneOf'
+        '401':
+          $ref: '#/components/responses/401Unauthorized'
+        '404':
+          $ref: '#/components/responses/404NotFound'
+        '500':
+          $ref: '#/components/responses/500InternalServerError'
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  schemas:
+    Email:
+      description: User's email address.
+      type: string
+      format: email
+      example: test@test.com
+    Password:
+      description: User's password.
+      type: string
+      format: password
+      example: AGreatPassword123
+    Token:
+      description: User's authentication token.
+      type: string
+      format: jwt
+      example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+    Tokens:
+      description: Tokens for authentication
+      type: object
+      properties:
+        token:
+          $ref: '#/components/schemas/Token'
+          description: Access token for authentication
+        refreshToken:
+          $ref: '#/components/schemas/Token'
+          description: Refresh token for obtaining new access tokens
+    400BadRequestExpressValidator:
+      description: Bad Request Express Validator
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              errors:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    location:
+                      type: string
+                      example: body
+                    msg:
+                      type: string
+                      example: Invalid input data
+                    param:
+                      type: string
+                      example: name
+                    value:
+                      type: string
+                      example: ''
+    400BadRequest:
+      description: Bad Request
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+                description: Error message
+                example: Bad Request
+    TaskTitle:
+      description: Task title
+      type: string
+      example: Complete the project report
+    TaskDescription:
+      description: Task description
+      type: string
+      example: This is a task description.
+    TaskStatus:
+      description: Task description
+      type: string
+      enum:
+        - pending
+        - in-progress
+        - completed
+      example: pending
+      default: pending
+    Date:
+      description: Date in YYYY-MM-DD format
+      type: string
+      format: date
+      example: '2025-04-22'
+    ID:
+      description: Task ID
+      type: string
+      readOnly: true
+      example: 68079aee64d16c8321ccf104
+    DateTime:
+      description: Date time in ISO 8601 format.
+      type: string
+      format: date-time
+      example: '2025-05-13T12:47:47.508Z'
+    Task:
+      description: Task
+      type: object
+      properties:
+        _id:
+          $ref: '#/components/schemas/ID'
+          description: ID of the task.
+        title:
+          $ref: '#/components/schemas/TaskTitle'
+        description:
+          $ref: '#/components/schemas/TaskDescription'
+        status:
+          $ref: '#/components/schemas/TaskStatus'
+        dueDate:
+          $ref: '#/components/schemas/DateTime'
+        userId:
+          $ref: '#/components/schemas/ID'
+          description: User ID associated with the task.
+        createdAt:
+          $ref: '#/components/schemas/DateTime'
+          description: Timestamp when the task was created.
+        updatedAt:
+          $ref: '#/components/schemas/DateTime'
+          description: Timestamp when the task was last updated.
+  responses:
+    400BadRequestExpressValidator:
+      description: Bad Request Express Validator
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              errors:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    location:
+                      type: string
+                      example: body
+                    msg:
+                      type: string
+                      example: Invalid input data
+                    param:
+                      type: string
+                      example: name
+                    value:
+                      type: string
+                      example: ''
+    401Unauthorized:
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+                description: Error message
+                example: Unauthorized
+    500InternalServerError:
+      description: Internal Server Error
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+                description: Error message
+                example: Internal Server Error
+    400BadRequestOneOf:
+      description: Bad Request One Of
+      content:
+        application/json:
+          schema:
+            oneOf:
+              - $ref: '#/components/schemas/400BadRequestExpressValidator'
+              - $ref: '#/components/schemas/400BadRequest'
+    429TooManyRequests:
+      description: Too Many Requests
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+                description: Error message
+                example: Too Many Requests
+    404NotFound:
+      description: Not Found
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+                description: Error message
+                example: Not Found
