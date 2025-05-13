@@ -1,7 +1,7 @@
 description: Task
 type: object
 properties:
-  id:
+  _id:
     $ref: 'ID.yaml'
     description: ID of the task.
   title:
@@ -11,7 +11,7 @@ properties:
   status:
     $ref: 'TaskStatus.yaml'
   dueDate:
-    $ref: 'Date.yaml'
+    $ref: 'DateTime.yaml'
   userId:
     $ref: 'ID.yaml'
     description: User ID associated with the task.
