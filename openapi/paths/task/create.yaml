@@ -1,0 +1,38 @@
+tags:
+  - Task
+summary: Create
+description: Create a new task in the application.
+operationId: task-create
+security:
+  - BearerAuth: [ ]
+requestBody:
+  content:
+    application/json:
+      schema:
+        type: object
+        properties:
+          title:
+            $ref: "../components/schemas/TaskTitle.yaml"
+            required: true
+          'description':
+            $ref: "../components/schemas/TaskDescription.yaml"
+            required: false
+          status:
+            $ref: "../components/schemas/TaskStatus.yaml"
+            required: false
+          dueDate:
+            $ref: "../components/schemas/Date.yaml"
+            required: true
+responses:
+  '201':
+    description: Created task successfully
+    content:
+      application/json:
+        schema:
+          $ref: "../components/schemas/Task.yaml"
+  '400':
+    $ref: "../components/responses/400BadRequestOneOf.yaml"
+  '401':
+    $ref: "../components/responses/401Unauthorized.yaml"
+  '500':
+    $ref: "../components/responses/500InternalServerError.yaml"
