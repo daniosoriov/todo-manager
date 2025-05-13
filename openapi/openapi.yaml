@@ -20,19 +20,9 @@ tags:
     description: "Operations related to tasks."
 
 servers:
-  - url: { http-protocol }://{address}:{port}/v1.0
+  - url: http://localhost:{port}/v1.0
     description: Localhost Development Server
     variables:
-      http-protocol:
-        default: http
-        enum:
-          - http
-          - https
-      address:
-        default: localhost
-        enum:
-          - localhost
-          - example.com
       port:
         default: '3000'
         enum:
@@ -42,17 +32,19 @@ paths:
   /auth/login:
     $ref: 'paths/auth/login.yaml'
   /auth/signup:
-    $ref: 'paths/auth/signup.yaml'
+    $ref: 'paths/auth/register.yaml'
   /auth/refresh-token:
     $ref: 'paths/auth/refresh-token.yaml'
-  /task/create:
-    $ref: 'paths/task/create.yaml'
-  /task/delete:
-    $ref: 'paths/task/delete.yaml'
+  /task:
+    post:
+      $ref: 'paths/task/create.yaml'
   /task/{taskId}:
-    $ref: 'paths/task/get_{taskId}.yaml'
-  /task/{taskId}/update:
-    $ref: 'paths/task/update_{taskId}.yaml'
+    get:
+      $ref: 'paths/task/get.yaml'
+    put:
+      $ref: 'paths/task/update.yaml'
+    delete:
+      $ref: 'paths/task/delete.yaml'
 
 security:
   - BearerAuth: [ ]
