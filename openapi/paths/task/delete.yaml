@@ -1,0 +1,33 @@
+tags:
+  - Task
+summary: Delete
+description: Delete a task.
+operationId: task-delete
+security:
+  - BearerAuth: [ ]
+parameters:
+  - name: taskId
+    in: path
+    required: true
+    description: The ID of the task to be deleted.
+    schema:
+      $ref: "../components/schemas/ID.yaml"
+responses:
+  '200':
+    description: Deleted task successfully
+    content:
+      application/json:
+        schema:
+          type: object
+          properties:
+            message:
+              description: Success message
+              type: string
+  '400':
+    $ref: "../components/responses/400BadRequestOneOf.yaml"
+  '401':
+    $ref: "../components/responses/401Unauthorized.yaml"
+  '404':
+    $ref: "../components/responses/404NotFound.yaml"
+  '500':
+    $ref: "../components/responses/500InternalServerError.yaml"
