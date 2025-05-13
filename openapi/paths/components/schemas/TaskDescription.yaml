@@ -1,0 +1,3 @@
+description: Task description
+type: string
+example: "This is a task description."
