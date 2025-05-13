@@ -1,0 +1,8 @@
+description: Task description
+type: string
+enum:
+  - pending
+  - in-progress
+  - completed
+example: 'pending'
+default: 'pending'
