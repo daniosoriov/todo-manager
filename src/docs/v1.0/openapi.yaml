@@ -7,7 +7,7 @@ info:
     email: danioshi@gmail.com
   license:
     name: Apache 2.0
-    url: http://www.apache.org/licenses/LICENSE-2.0.html
+    url: https://www.apache.org/licenses/LICENSE-2.0.html
   description: This is the API definition for the TODO Task Manager API.
 servers:
   - url: http://localhost:{port}/v1.0
